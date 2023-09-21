@@ -1,0 +1,12 @@
+debug:
+  enabled: true
+
+hubble:
+  ui:
+    enabled: true
+    rollOutPods: true
+
+  relay:
+    enabled: true
+    rollOutPods: true
+
