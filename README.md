@@ -1,6 +1,6 @@
 # Homelab
 
-⚠️ *work in progress* ⚠️
+⚠️ *work in progress*
 
 - [x] Setup a cluster with 3 nodes
 - [x] Add cilium as the CNI
