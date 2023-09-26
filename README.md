@@ -7,7 +7,9 @@ This is a work in progress.
 - [x] Add LoadBalancing
 - [x] Add Sealed secrets
 - [ ] Add an ingress controller
+- [ ] Set up cert-manager
 - [ ] Configure a service mesh for the cluster
+- [ ] Make the services all mTLS
 - [ ] Add ArgoCd
 - [ ] Add first application
 
