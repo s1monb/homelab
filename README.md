@@ -1,8 +1,13 @@
-# homelab
+# Homelab
 
-## Setup
+This is a work in progress.
 
-### Setup the nodes
+- [ ] Add an ingress controller
+- [ ] Add a service mesh
+- [ ] Add ArgoCD
+- [ ] Add first application
+
+## Kubernetes Cluster Setup
 
 When going through the guide bellow, you should:
 
@@ -11,7 +16,7 @@ When going through the guide bellow, you should:
 
 Follow [this guide](https://www.linuxtechi.com/install-kubernetes-cluster-on-debian/).
 
-### Setup Cilium (CNI)
+## Cilium with LoadBalancing (CNI)
 
 Install it on the cluster:
 
@@ -29,7 +34,7 @@ cilium status
 cilium connectivity test
 ```
 
-### LoadBalancer with cilium
+### LoadBalancing
 
 With Cilium version `>=14`, IP-assignment and announcement is enabled easily by adding an ip-pool to the cluster and setting the `l2announcement.enabled=true`.
 
