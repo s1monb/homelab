@@ -2,6 +2,10 @@
 
 This is a work in progress.
 
+- [x] Setup a cluster with 3 nodes
+- [x] Add cilium as the CNI
+- [x] Add LoadBalancing
+- [x] Add Sealed secrets
 - [ ] Add an ingress controller
 - [ ] Configure a service mesh for the cluster
 - [ ] Add ArgoCd
@@ -41,6 +45,20 @@ With Cilium version `>=14`, IP-assignment and announcement is enabled easily by 
 LoadBalancing is enabled in the `values.yaml`-file.
 
 You can request spesific ips (like `192.168.0.200`) in the pool by annotation `LoadBalancer`s with `"io.cilium/lb-ipam-ips": "192.168.0.200"`.
+
+### Secrets using Sealed Secrets
+
+```bash
+kubectl kustomize --enable-helm infrastructure/sealed-secrets | kubectl apply -f -
+```
+
+Now you can use Sealed secrets. [How to use them](./infrastructure/sealed-secrets/howto.md).
+
+Might be an idea to make a backup of the private key (keep this safe):
+
+```bash
+kubectl get secret -n kube-system -l sealedsecrets.bitnami.com/sealed-secrets-key -o yaml > master.yaml
+```
 
 ## References
 
