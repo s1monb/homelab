@@ -2,13 +2,11 @@
 
 ## Table of contents
 
-- [Homelab](#homelab)
-  - [Table of contents](#table-of-contents)
-  - [Kubernetes Cluster Setup](#kubernetes-cluster-setup)
-  - [Cilium with LoadBalancing (CNI)](#cilium-with-loadbalancing-cni)
-    - [LoadBalancing](#loadbalancing)
-  - [Secrets using Sealed Secrets](#secrets-using-sealed-secrets)
-  - [References](#references)
+- [Kubernetes Cluster Setup](#kubernetes-cluster-setup)
+- [Cilium with LoadBalancing (CNI)](#cilium-with-loadbalancing-cni)
+  - [LoadBalancing](#loadbalancing)
+- [Secrets using Sealed Secrets](#secrets-using-sealed-secrets)
+- [References](#references)
 
 This is a work in progress.
 
