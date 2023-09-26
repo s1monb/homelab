@@ -1,5 +1,15 @@
 # Homelab
 
+## Table of contents
+
+- [Homelab](#homelab)
+  - [Table of contents](#table-of-contents)
+  - [Kubernetes Cluster Setup](#kubernetes-cluster-setup)
+  - [Cilium with LoadBalancing (CNI)](#cilium-with-loadbalancing-cni)
+    - [LoadBalancing](#loadbalancing)
+  - [Secrets using Sealed Secrets](#secrets-using-sealed-secrets)
+  - [References](#references)
+
 This is a work in progress.
 
 - [x] Setup a cluster with 3 nodes
@@ -48,7 +58,7 @@ LoadBalancing is enabled in the `values.yaml`-file.
 
 You can request spesific ips (like `192.168.0.200`) in the pool by annotation `LoadBalancer`s with `"io.cilium/lb-ipam-ips": "192.168.0.200"`.
 
-### Secrets using Sealed Secrets
+## Secrets using Sealed Secrets
 
 ```bash
 kubectl kustomize --enable-helm infrastructure/sealed-secrets | kubectl apply -f -
