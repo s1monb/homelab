@@ -1,14 +1,6 @@
 # Homelab
 
-## Table of contents
-
-- [Kubernetes Cluster Setup](#kubernetes-cluster-setup)
-- [Cilium with LoadBalancing (CNI)](#cilium-with-loadbalancing-cni)
-  - [LoadBalancing](#loadbalancing)
-- [Secrets using Sealed Secrets](#secrets-using-sealed-secrets)
-- [References](#references)
-
-This is a work in progress.
+This is a ==work in progress==.
 
 - [x] Setup a cluster with 3 nodes
 - [x] Add cilium as the CNI
@@ -20,6 +12,15 @@ This is a work in progress.
 - [ ] Make the services all mTLS
 - [ ] Add ArgoCd
 - [ ] Add first application
+
+## Table of contents
+
+- [Kubernetes Cluster Setup](#kubernetes-cluster-setup)
+- [Cilium with LoadBalancing (CNI)](#cilium-with-loadbalancing-cni)
+  - [LoadBalancing](#loadbalancing)
+- [Secrets using Sealed Secrets](#secrets-using-sealed-secrets)
+- [References](#references)
+
 
 ## Kubernetes Cluster Setup
 
