@@ -3,8 +3,8 @@
 This is a work in progress.
 
 - [ ] Add an ingress controller
-- [ ] Add a service mesh
-- [ ] Add ArgoCD
+- [ ] Configure a service mesh for the cluster
+- [ ] Add ArgoCd
 - [ ] Add first application
 
 ## Kubernetes Cluster Setup
