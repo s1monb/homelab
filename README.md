@@ -5,6 +5,7 @@
 - [x] Setup a cluster with 3 nodes
 - [x] Add cilium as the CNI
 - [x] Add LoadBalancing
+- [ ] Set up network-policies and document it
 - [x] Add Sealed secrets
 - [ ] Add an ingress controller
 - [ ] Set up cert-manager
@@ -20,7 +21,6 @@
   - [LoadBalancing](#loadbalancing)
 - [Secrets using Sealed Secrets](#secrets-using-sealed-secrets)
 - [References](#references)
-
 
 ## Kubernetes Cluster Setup
 
