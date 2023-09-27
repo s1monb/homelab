@@ -4,6 +4,6 @@ metadata:
   name: hubble-ui
   namespace: kube-system
   annotations:
-    "io.cilium/lb-ipam-ips": "192.168.0.200"
+    "io.cilium/lb-ipam-ips": "192.168.0.225"
 spec:
   type: LoadBalancer
