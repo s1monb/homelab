@@ -1,6 +1,10 @@
 debug:
   enabled: true
 
+# This tells cilium to only allow traffic that 
+# has explicitly been allowed by a policy
+policyEnforcementMode: "always"
+
 k8sServiceHost: 192.168.0.23
 k8sServicePort: 6443
 

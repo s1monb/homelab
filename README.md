@@ -5,7 +5,7 @@
 - [x] Setup a cluster with 3 nodes
 - [x] Add cilium as the CNI
 - [x] Add LoadBalancing
-- [ ] Set up network-policies and document it
+- [x] Set up network-policies and document it
 - [x] Add Sealed secrets
 - [ ] Add an ingress controller
 - [ ] Set up cert-manager
@@ -48,6 +48,8 @@ cilium status
 
 cilium connectivity test
 ```
+
+To make a service discoverable, you have to create a policy. [Here's how](./infrastructure/cilium/NetworkPolicies.md)
 
 ### LoadBalancing
 

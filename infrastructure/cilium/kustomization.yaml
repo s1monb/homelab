@@ -6,8 +6,9 @@ patchesStrategicMerge:
   - patches/hubble-ui-service.yaml
 
 resources:
-  - ip-pool.yaml
-  - ip-advertisement.yaml
+  - ip-pool-and-advertisement.yaml
+  - allow-hubble.yaml
+  - allow-coredns.yaml
 
 helmCharts:
   - name: cilium
