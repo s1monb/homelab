@@ -22,11 +22,11 @@ l2announcements:
 externalIPs:
   enabled: true
 
-hubble:
-  ui:
-    enabled: true
-    rollOutPods: true
+# hubble:
+#   ui:
+#     enabled: false
+#     rollOutPods: true
 
-  relay:
-    enabled: true
-    rollOutPods: true
+#   relay:
+#     enabled: false
+#     rollOutPods: true

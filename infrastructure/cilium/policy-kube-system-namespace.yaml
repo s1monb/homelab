@@ -2,15 +2,17 @@
 apiVersion: cilium.io/v2
 kind: CiliumNetworkPolicy
 metadata:
-  name: allow-coredns
+  name: policy-kube-system-namespace
   namespace: kube-system
 spec:
   endpointSelector:
     matchLabels:
-      "k8s-app": kube-dns
+      {}
+
   ingress:
   - fromEntities:
     - cluster
+
   egress:
   - toEntities:
     - cluster
