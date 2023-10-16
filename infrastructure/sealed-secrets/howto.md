@@ -16,6 +16,8 @@ cat secret.yaml | kubeseal --controller-namespace kube-system --controller-name 
 
 *`sed '$d'` is used to remove the trailing `---` kubeseal leaves behind.*
 
+Also, you should ofcourse remove the `secret.yaml`-file before checking into git.
+
 ## Disaster Recovery
 
 See how you can make sure you dont loose you secrets [here](https://blog.knoldus.com/using-sealed-secrets-in-kubernetes/#disaster-recovery-for-sealed-secrets).
