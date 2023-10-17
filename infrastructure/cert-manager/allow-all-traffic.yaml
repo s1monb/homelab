@@ -1,0 +1,16 @@
+apiVersion: cilium.io/v2
+kind: CiliumNetworkPolicy
+metadata:
+  name: allow-traffic
+  namespace: cert-manager
+spec:
+  endpointSelector:
+    matchLabels:
+      {}
+
+  ingress:
+    - fromEntities:
+        - all
+  egress:
+    - toEntities:
+        - all
