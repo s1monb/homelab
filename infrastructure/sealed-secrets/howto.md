@@ -11,12 +11,13 @@ This will generate a secret.yaml file with a secret named "mysecret"
 Then run in the folder with the secet:
 
 ```bash
-cat secret.yaml | kubeseal --controller-namespace kube-system --controller-name sealed-secrets --format yaml | sed '$d'  > sealed-secret.yaml
+cat secret.yaml | kubeseal --controller-namespace kube-system --controller-name sealed-secrets --format yaml | sed '$d'  > cloudflare-api-token.yaml
 ```
 
 *`sed '$d'` is used to remove the trailing `---` kubeseal leaves behind.*
 
-Also, you should ofcourse remove the `secret.yaml`-file before checking into git.
+Also, you should ofcourse remove the `secret.yaml`-file before checking into git. s
+Or add it to the `.gitignore` file.
 
 ## Disaster Recovery
 
