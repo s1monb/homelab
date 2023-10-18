@@ -3,13 +3,13 @@ debug:
 
 # This tells cilium to only allow traffic that 
 # has explicitly been allowed by a policy
-policyEnforcementMode: "always"
+policyEnforcementMode: "strict"
 
 k8sServiceHost: 192.168.0.23
 k8sServicePort: 6443
 
 # Needs to be "strict" for cilium to work
-kubeProxyReplacement: strict
+kubeProxyReplacement: "strict"
 
 loadBalancer: 
   l7:
@@ -22,11 +22,20 @@ l2announcements:
 externalIPs:
   enabled: true
 
-# hubble:
-#   ui:
-#     enabled: false
-#     rollOutPods: true
-
-#   relay:
-#     enabled: false
-#     rollOutPods: true
+hubble:
+  enabled: false
+  tls:
+    enabled: false
+  ui:
+    enabled: false
+    rollOutPods: true
+    service:
+      type: LoadBalancer
+      annotations:
+        "io.cilium/lb-ipam-ips": "192.168.0.228"
+  relay:
+    enabled: false
+    rollOutPods: true
+    tls:
+      server:
+        enabled: false

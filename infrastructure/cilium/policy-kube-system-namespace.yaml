@@ -5,14 +5,12 @@ metadata:
   name: policy-kube-system-namespace
   namespace: kube-system
 spec:
-  endpointSelector:
-    matchLabels:
-      {}
+  endpointSelector: {}
 
   ingress:
   - fromEntities:
-    - cluster
+    - all
 
   egress:
   - toEntities:
-    - cluster
+    - all

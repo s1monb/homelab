@@ -1,6 +1,6 @@
 # How to set up network policies for new deployments/workloads
 
-This cluster is set up to deny all network-traffic by default. To enable traffic from both inside or outside cluster, you have to set up a `ciliumNetworkPolicy`.
+This cluster is set up to deny all network-traffic by default. To enable traffic from both inside or outside cluster, you have to set up a `CiliumNetworkPolicy`.
 
 To do this, please refer to [this guide](https://docs.cilium.io/en/latest/security/policy/language/#endpoints-based).
 
