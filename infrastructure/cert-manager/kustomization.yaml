@@ -4,5 +4,5 @@ kind: Kustomization
 resources:
   - https://github.com/cert-manager/cert-manager/releases/download/v1.13.0/cert-manager.yaml
   - cloudflare-issuer.yaml
-  - cloudflare-api-token.yaml
+  - cloudflare-api-token.yamlse
   - allow-all-traffic.yaml
