@@ -22,20 +22,40 @@ l2announcements:
 externalIPs:
   enabled: true
 
-hubble:
+tls:
   enabled: false
-  tls:
-    enabled: false
+
+hubble:
+  enabled: true
   ui:
-    enabled: false
-    rollOutPods: true
-    service:
-      type: LoadBalancer
+    enabled: true
+    ingress:
+      enabled: true
       annotations:
-        "io.cilium/lb-ipam-ips": "192.168.0.228"
+        cert-manager.io/cluster-issuer: cloudflare-issuer
+      hosts:
+        - hubble.valley.no
   relay:
-    enabled: false
-    rollOutPods: true
-    tls:
-      server:
-        enabled: false
+    enabled: true
+
+# MTLS
+
+authentication:
+  mutual:
+    # -- Port on the agent where mutual authentication handshakes between agents will be performed
+    port: 4250
+    # -- Timeout for connecting to the remote node TCP socket
+    connectTimeout: 5s
+    # Settings for SPIRE
+    spire:
+      # -- Enable SPIRE integration (beta)
+      enabled: true
+      # -- Annotations to be added to all top-level spire objects (resources under templates/spire)
+      annotations: {}
+      # Settings to control the SPIRE installation and configuration
+      install:
+        # -- Enable SPIRE installation.
+        # This will only take effect only if authentication.mutual.spire.enabled is true
+        enabled: true
+        # -- SPIRE namespace to install into
+        namespace: cilium-spire
