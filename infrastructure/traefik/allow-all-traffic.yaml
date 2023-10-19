@@ -1,0 +1,14 @@
+apiVersion: cilium.io/v2
+kind: CiliumNetworkPolicy
+metadata:
+  name: allow-traffic
+  namespace: traefik
+spec:
+  endpointSelector: {}
+
+  ingress:
+    - fromEntities:
+        - all
+  egress:
+    - toEntities:
+        - all

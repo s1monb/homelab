@@ -1,3 +1,2 @@
 infrastructure/**/charts
-infrastructure/traefik/cloudflare-api-token-secret.yaml
-infrastructure/traefik/cloudflare-tls-secret.yaml
+infrastructure/cert-manager/cloudflare-api-token-secret.yaml
