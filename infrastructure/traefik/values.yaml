@@ -2,12 +2,12 @@ deployment:
   initContainers:
      # The "volume-permissions" init container is required if you run into permission issues.
      # Related issue: https://github.com/traefik/traefik/issues/6972
-    - name: volume-permissions
-      image: busybox:1.31.1
-      command: [ "sh", "-c", "chmod -Rv 600 /data/*" ]
-      volumeMounts:
-        - name: data
-          mountPath: /data
+#    - name: volume-permissions
+#      image: busybox:1.31.1
+#      command: [ "sh", "-c", "chmod -Rv 600 /data/*" ]
+#      volumeMounts:
+#        - name: data
+#          mountPath: /data
 
 providers:
   kubernetesCRD:
@@ -31,14 +31,14 @@ ingressRoute:
   dashboard:
     enabled: false
 
-persistence:
-  enabled: true
-  name: data
-  accessMode: ReadWriteOnce
-  size: 128Mi
-  storageClass: cert-storage
-  volumeName: traefik-cert-pv
-  path: /data
+#persistence:
+#  enabled: true
+#  name: data
+#  accessMode: ReadWriteOnce
+#  size: 128Mi
+#  storageClass: cert-storage
+#  volumeName: traefik-cert-pv
+#  path: /data
 
 tlsStore:
   default:
