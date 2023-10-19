@@ -1,0 +1,23 @@
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  name: whoami
+  namespace: whoami
+  annotations:
+    cert-manager.io/cluster-issuer: cloudflare-issuer
+spec:
+  tls:
+    - hosts:
+        - whoami.valley.no
+      secretName: whoami-valley-no-tls
+  rules:
+    - host: whoami.valley.no
+      http:
+        paths:
+          - path: /
+            pathType: Prefix
+            backend:
+              service:
+                name: whoami
+                port:
+                  name: web

@@ -1,0 +1,23 @@
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  name: nginx
+  namespace: nginx
+  annotations:
+    cert-manager.io/cluster-issuer: cloudflare-issuer
+spec:
+  tls:
+    - hosts:
+        -  nginx.valley.no
+      secretName: nginx-valley-no-tls
+  rules:
+    - host: nginx.valley.no
+      http:
+        paths:
+          - path: /
+            pathType: Prefix
+            backend:
+              service:
+                name: nginx
+                port:
+                  name: web
