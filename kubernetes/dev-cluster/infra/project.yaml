@@ -1,0 +1,16 @@
+apiVersion: argoproj.io/v1alpha1
+kind: AppProject
+metadata:
+  name: controllers
+  namespace: argocd
+spec:
+  sourceRepos:
+    - "https://github.com/s1monb/homelab"
+  destinations:
+    - namespace: "argocd"
+      server: "*"
+    - namespace: "cilium"
+      server: "*"
+  clusterResourceWhitelist:
+    - group: "*"
+      kind: "*"
