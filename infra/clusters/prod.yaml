@@ -1,0 +1,25 @@
+cluster_name: prod
+
+default_gateway: 10.1.0.1
+
+talos_version: "blue"
+
+control_plane:
+  nodes:
+    - name: cp-01
+      ip: "10.1.0.21"
+      cpu: 2
+      memory: 4
+      storage: 25
+
+worker_nodes:
+  - name: worker-01
+    ip: "10.1.0.31"
+    cpu: 2
+    memory: 4
+    storage: 25
+  - name: worker-02
+    ip: "10.1.0.32"
+    cpu: 2
+    memory: 4
+    storage: 25

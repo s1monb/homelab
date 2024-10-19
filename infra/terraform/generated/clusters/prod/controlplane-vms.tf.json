@@ -1,0 +1,60 @@
+{
+  "resource": {
+    "proxmox_virtual_environment_vm": {
+      "prod_cp-01": {
+        "name": "prod-cp-01",
+        "description": "Managed by Terraform",
+        "tags": [
+          "terraform"
+        ],
+        "node_name": "pve",
+        "on_boot": true,
+        "cpu": {
+          "cores": 2,
+          "type": "x86-64-v2-AES"
+        },
+        "memory": {
+          "dedicated": 4096
+        },
+        "agent": {
+          "enabled": true
+        },
+        "network_device": {
+          "bridge": "vmbr0"
+        },
+        "disk": {
+          "datastore_id": "local-lvm",
+          "file_id": "${var.iso_file}",
+          "file_format": "raw",
+          "interface": "virtio0",
+          "size": 25
+        },
+        "operating_system": {
+          "type": "l26"
+        },
+        "initialization": {
+          "datastore_id": "local-lvm",
+          "ip_config": {
+            "ipv4": {
+              "address": "10.1.0.21/24",
+              "gateway": "10.1.0.1"
+            },
+            "ipv6": {
+              "address": "dhcp"
+            }
+          }
+        }
+      }
+    },
+    "talos_machine_configuration_apply": {
+      "prod_cp-01_config_apply": {
+        "depends_on": [
+          "proxmox_virtual_environment_vm.prod_cp-01"
+        ],
+        "client_configuration": "${talos_machine_secrets.prod_machine_secrets.client_configuration}",
+        "machine_configuration_input": "${data.talos_machine_configuration.prod_machineconfig_cp.machine_configuration}",
+        "node": "10.1.0.21"
+      }
+    }
+  }
+}

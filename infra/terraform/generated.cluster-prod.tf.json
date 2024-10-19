@@ -1,0 +1,1 @@
+{"module":{"cluster-prod":{"source":"./generated/clusters/prod","iso_file":"${proxmox_virtual_environment_download_file.talos_nocloud_image_blue.id}"}},"output":{"prod_kubeconfig":{"value":"${module.cluster-prod.prod_kubeconfig}","sensitive":"true"}}}

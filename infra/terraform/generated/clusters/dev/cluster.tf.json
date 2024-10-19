@@ -1,0 +1,78 @@
+{
+  "resource": {
+    "talos_machine_secrets": {
+      "dev_machine_secrets": {}
+    },
+    "talos_machine_bootstrap": {
+      "dev_bootstrap": {
+        "depends_on": [
+          "talos_machine_configuration_apply.dev_cp-01_config_apply"
+        ],
+        "client_configuration": "${talos_machine_secrets.dev_machine_secrets.client_configuration}",
+        "node": "10.1.0.41"
+      }
+    },
+    "talos_cluster_kubeconfig": {
+      "dev_kubeconfig": {
+        "depends_on": [
+          "talos_machine_bootstrap.dev_bootstrap"
+        ],
+        "client_configuration": "${data.talos_client_configuration.dev_talosconfig.client_configuration}",
+        "node": "10.1.0.41"
+      }
+    }
+  },
+  "data": {
+    "talos_client_configuration": {
+      "dev_talosconfig": {
+        "cluster_name": "dev",
+        "client_configuration": "${talos_machine_secrets.dev_machine_secrets.client_configuration}",
+        "endpoints": [
+          "10.1.0.41"
+        ]
+      }
+    },
+    "talos_machine_configuration": {
+      "dev_machineconfig_cp": {
+        "cluster_name": "dev",
+        "cluster_endpoint": "https://10.1.0.41:6443",
+        "machine_type": "controlplane",
+        "machine_secrets": "${talos_machine_secrets.dev_machine_secrets.machine_secrets}",
+        "config_patches": [
+          "${templatefile(\"${path.module}/talos-config.yaml.tftpl\", {})}"
+        ]
+      },
+      "dev_machineconfig_worker": {
+        "cluster_name": "dev",
+        "cluster_endpoint": "https://10.1.0.41:6443",
+        "machine_type": "worker",
+        "machine_secrets": "${talos_machine_secrets.dev_machine_secrets.machine_secrets}"
+      }
+    },
+    "talos_cluster_health": {
+      "dev_health": {
+        "depends_on": [
+          "talos_machine_configuration_apply.dev_cp-01_config_apply",
+          "talos_machine_configuration_apply.dev_worker-01_config_apply",
+          "talos_machine_configuration_apply.dev_worker-02_config_apply"
+        ],
+        "client_configuration": "${data.talos_client_configuration.dev_talosconfig.client_configuration}",
+        "control_plane_nodes": [
+          "10.1.0.41"
+        ],
+        "worker_nodes": [
+          "10.1.0.51",
+          "10.1.0.52"
+        ],
+        "skip_kubernetes_checks": true,
+        "endpoints": "${data.talos_client_configuration.dev_talosconfig.endpoints}"
+      }
+    }
+  },
+  "output": {
+    "dev_kubeconfig": {
+      "value": "${talos_cluster_kubeconfig.dev_kubeconfig.kubeconfig_raw}",
+      "sensitive": "true"
+    }
+  }
+}

@@ -1,0 +1,8 @@
+.envrc
+
+**/*/charts/
+
+.DS_Store
+
+**/*/.terraform*
+**/*.tfstate*
