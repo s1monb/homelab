@@ -14,7 +14,7 @@ spec:
     metadata:
       name: "{{ path.basename }}"
     spec:
-      project: infra
+      project: default
       source:
         plugin:
           name: kustomize-build-with-helm
