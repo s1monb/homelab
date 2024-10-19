@@ -1,7 +1,7 @@
 apiVersion: argoproj.io/v1alpha1
 kind: AppProject
 metadata:
-  name: controllers
+  name: infra
   namespace: argocd
 spec:
   sourceRepos:
