@@ -10,5 +10,5 @@ helmCharts:
     version: 7.6.12
     releaseName: "argocd"
     includeCRDs: true
-    namespace: kube-system
+    namespace: argocd
     valuesFile: values.yaml
