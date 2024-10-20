@@ -6,8 +6,8 @@ resources:
 
 helmCharts:
   - name: connect
-    repo: https://argoproj.github.io/argo-helm
-    version: 7.6.12
+    repo: https://1password.github.io/connect-helm-charts
+    version: 1.16.0
     releaseName: "connect"
     includeCRDs: true
     namespace: onepassword
