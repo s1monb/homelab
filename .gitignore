@@ -6,3 +6,5 @@
 
 **/*/.terraform*
 **/*.tfstate*
+
+1password-credentials.json
