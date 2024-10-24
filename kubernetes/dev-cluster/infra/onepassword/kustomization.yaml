@@ -4,6 +4,12 @@ kind: Kustomization
 resources:
   - namespace.yaml
   - secrets.yaml
+  - manager.yaml
+
+images:
+  - name: controller
+    newName: 1password/onepassword-operator
+    newTag: latest
 
 helmCharts:
   - name: connect
