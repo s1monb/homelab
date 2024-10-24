@@ -3,6 +3,7 @@ configs:
     create: true
     application.resourceTrackingMethod: "annotation+label"
     admin.enabled: true
+    controller.diff.server.side: true
 
   cmp:
     create: true
@@ -19,7 +20,6 @@ crds:
   # -- Keep CRDs on chart uninstall
   keep: false
 
-controller.diff.server.side: true
 repoServer:
   containerSecurityContext:
     readOnlyRootFilesystem: true
