@@ -19,6 +19,7 @@ crds:
   # -- Keep CRDs on chart uninstall
   keep: false
 
+controller.diff.server.side: true
 repoServer:
   containerSecurityContext:
     readOnlyRootFilesystem: true

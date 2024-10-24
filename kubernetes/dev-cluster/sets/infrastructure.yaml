@@ -3,7 +3,6 @@ kind: Application
 metadata:
   name: infrastructure
   namespace: argocd
-  argocd.argoproj.io/compare-options: ServerSideDiff=true
 spec:
   project: app-of-apps
   source:
