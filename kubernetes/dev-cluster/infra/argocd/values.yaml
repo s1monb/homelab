@@ -15,6 +15,10 @@ configs:
   params:
     server.insecure: true
 
+server.service:
+  type: NodePort
+  nodePortHttp: 8080
+
 crds:
   install: true
   # -- Keep CRDs on chart uninstall
