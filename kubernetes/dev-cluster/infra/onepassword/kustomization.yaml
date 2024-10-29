@@ -3,7 +3,8 @@ kind: Kustomization
 
 resources:
   - namespace.yaml
-  - secrets.yaml
+  - sealed-1password-credentials.yaml
+  - sealed-1password-token.yaml
 
 helmCharts:
   - name: connect
