@@ -1,0 +1,9 @@
+storageClass:
+  - name: data
+    cache: writethrough
+    fstype: ext4
+    reclaimPolicy: Retain
+    ssd: false
+    storage: data
+    mountOptions:
+      - noatime

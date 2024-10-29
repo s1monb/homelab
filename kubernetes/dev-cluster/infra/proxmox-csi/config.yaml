@@ -1,0 +1,7 @@
+apiVersion: onepassword.com/v1
+kind: OnePasswordItem
+metadata:
+  namespace: proxmox-csi
+  name: proxmox-csi-plugin
+spec:
+  itemPath: "vaults/dev-cluster/items/proxmox-csi-plugin"
