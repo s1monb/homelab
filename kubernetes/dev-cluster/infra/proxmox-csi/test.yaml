@@ -2,7 +2,7 @@ apiVersion: v1
 kind: Pod
 metadata:
   name: pod-test
-  namespace: proxmox-csi-test
+  namespace: proxmox-csi
 spec:
   nodeSelector:
     kubernetes.io/hostname: dev-worker-01
