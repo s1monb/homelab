@@ -4,6 +4,7 @@ kind: Kustomization
 resources:
   - namespace.yaml
   - config.yaml
+  - storageClass.yaml
 
 helmCharts:
   - name: proxmox-csi-plugin
