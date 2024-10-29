@@ -5,6 +5,7 @@ resources:
   - namespace.yaml
   - config.yaml
   - storageClass.yaml
+  - test.yaml
 
 helmCharts:
   - name: proxmox-csi-plugin

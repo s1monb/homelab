@@ -8,3 +8,6 @@
 **/*.tfstate*
 
 1password-credentials.json
+sealed-secrets.pem
+config.yaml
+1password-token.yaml
