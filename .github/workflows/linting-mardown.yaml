@@ -14,7 +14,7 @@ jobs:
         with:
           node-version: '18'
       - name: Install dependencies
-        run: npm install -g markdownlint2-cli
+        run: npm install -g markdownlint-cli2
       - name: Lint markdown files
         run: markdownlint2 --config .markdownlint.json '**/*.md'
     
