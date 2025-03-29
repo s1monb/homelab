@@ -6,6 +6,8 @@ to communicate with each other and share resources.
 
 ## Getting started
 
+Here is how you would set up a proxmox-cluster with two nodes.
+
 ### Installing Proxmox
 
 To get started with the cluster, you need to install Proxmox on both nodes.
