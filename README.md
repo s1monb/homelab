@@ -18,7 +18,7 @@ TODO
 
 ## Networking
 
-See [network-and-security/network-overview.md](network-and-security/network-overview.md)
+See [docs/network-and-security/network-overview.md](docs/network-and-security/network-overview.md) <!-- markdownlint-disable-line MD013 # Link length != length -->
 
 ## Security
 
