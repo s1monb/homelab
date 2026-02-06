@@ -66,6 +66,8 @@ cd layer0/bootstrap-manifests
 
 This will install argocd, and point an application towards the `layer0/apps-of-apps`-folder in this public repo.
 
+Change the `layer0/bootstrap-manifests/argocd/apps-of-apps.yaml`-file to fit your needs.
+
 #### Add nodes
 
 Adding a new node is as easy as booting it up on the iso and running:
@@ -85,3 +87,11 @@ Edit the config (or patches) in `layer0/talos-cfg/`, then apply to the relevant 
 ```bash
 talosctl apply-config --nodes <NODE_IP> --file controlplane.yaml --mode no-reboot
 ```
+
+### Todo
+
+- Figure out how to install and use multus CNI aside cilium
+- Figure out how to do hubble good and debug network issues
+- Figure out how to install and use kubevirt
+- Figure out how to install and use longhorn
+- Figure out how to install and use openbao
