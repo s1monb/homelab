@@ -58,6 +58,14 @@ Wait for the cluster to be ready (`talosctl health` or `kubectl get nodes`).
 
 For now we only need to install cilium and argo-cd. The rest of the config is handled through gitops.
 
+```bash
+cd layer0/bootstrap-manifests
+
+./bootstrap.sh
+```
+
+This will install argocd, and point an application towards the `layer0/apps-of-apps`-folder in this public repo.
+
 #### Add nodes
 
 Adding a new node is as easy as booting it up on the iso and running:
@@ -77,7 +85,3 @@ Edit the config (or patches) in `layer0/talos-cfg/`, then apply to the relevant 
 ```bash
 talosctl apply-config --nodes <NODE_IP> --file controlplane.yaml --mode no-reboot
 ```
-
-Reboot the node(s) if the changes require it (or omit `--mode no-reboot` to let Talos reboot when needed).
-
-#### 

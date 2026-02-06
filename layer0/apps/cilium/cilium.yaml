@@ -22,16 +22,6 @@ spec:
         k8sServicePort: 7445
         kubeProxyReplacement: true
 
-        l2announcements:
-          enabled: true
-
-        ingressController:
-          enabled: true
-          default: true
-          enforceHttps: false
-
-          loadbalancerMode: shared
-
         securityContext:
           capabilities:
             ciliumAgent:
@@ -53,3 +43,7 @@ spec:
   destination:
     server: "https://kubernetes.default.svc"
     namespace: kube-system
+  syncPolicy:
+    automated:
+      prune: true
+      selfHeal: true
