@@ -1,0 +1,12 @@
+cluster:
+  allowSchedulingOnControlPlanes: true
+  network:
+    cni:
+      name: none
+  proxy:
+    disabled: true
+
+machine:
+  install:
+    disk: /dev/nvme0n1 # Let Talos choose the disk automatically
+    wipe: true
