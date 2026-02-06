@@ -1,18 +1,55 @@
 apiVersion: argoproj.io/v1alpha1
 kind: Application
 metadata:
-  name: cilium
+  name: cilium-chart
   namespace: argocd
 spec:
   project: default
   source:
     chart: cilium
     repoURL: https://helm.cilium.io/
-    targetRevision: 1.16.1
+    targetRevision: 1.19.0
     helm:
       releaseName: cilium
-      valueFiles:
-        - values.yaml
+      values: |
+        cgroup:
+          autoMount:
+            enabled: false
+          hostRoot: /sys/fs/cgroup
+        ipam:
+          mode: kubernetes
+        k8sServiceHost: localhost
+        k8sServicePort: 7445
+        kubeProxyReplacement: true
+
+        l2announcements:
+          enabled: true
+
+        ingressController:
+          enabled: true
+          default: true
+          enforceHttps: false
+
+          loadbalancerMode: shared
+
+        securityContext:
+          capabilities:
+            ciliumAgent:
+            - CHOWN
+            - KILL
+            - NET_ADMIN
+            - NET_RAW
+            - IPC_LOCK
+            - SYS_ADMIN
+            - SYS_RESOURCE
+            - DAC_OVERRIDE
+            - FOWNER
+            - SETGID
+            - SETUID
+            cleanCiliumState:
+            - NET_ADMIN
+            - SYS_ADMIN
+            - SYS_RESOURCE
   destination:
     server: "https://kubernetes.default.svc"
     namespace: kube-system
