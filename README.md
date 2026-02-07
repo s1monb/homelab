@@ -95,3 +95,5 @@ talosctl apply-config --nodes <NODE_IP> --file controlplane.yaml --mode no-reboo
 - Figure out how to install and use kubevirt
 - Figure out how to install and use longhorn
 - Figure out how to install and use openbao
+- Figure out how to install and use grafana and the rest of the stack
+- Figure out how to install and use clusterAPI with kubevirt
