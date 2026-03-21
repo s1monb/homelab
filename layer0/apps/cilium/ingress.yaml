@@ -3,7 +3,13 @@ kind: Ingress
 metadata:
   name: valley-no
   namespace: valley-no
+  annotations:
+    cert-manager.io/cluster-issuer: letsencrypt-staging
 spec:
+  tls:
+    - hosts:
+        - valley.no
+      secretName: valley-no-tls
   rules:
     - host: valley.no
       http:
