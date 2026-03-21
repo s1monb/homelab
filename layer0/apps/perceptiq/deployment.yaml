@@ -29,10 +29,6 @@ spec:
                 secretKeyRef:
                   name: perceptiq-db-app
                   key: uri
-            - name: CLERK_ISSUER
-              value: https://enhanced-raven-64.clerk.accounts.dev
-            - name: CLERK_JWKS_URL
-              value: https://enhanced-raven-64.clerk.accounts.dev/.well-known/jwks.json
           envFrom:
             - secretRef:
                 name: perceptiq-secrets
