@@ -4,8 +4,11 @@ metadata:
   name: default
   namespace: argocd
 spec:
+  sourceRepos:
+    - "*"
   destinations:
-  - namespace: kube-system
-    server: https://kubernetes.default.svc
-  - namespace: "*"
-    server: https://kubernetes.default.svc
+    - namespace: "*"
+      server: "*"
+  clusterResourceWhitelist:
+    - group: "*"
+      kind: "*"
