@@ -46,6 +46,12 @@ spec:
           qps: 20
           burst: 100
 
+        ingressController:
+          enabled: true
+          default: true
+          enforceHttps: false
+          loadbalancerMode: shared
+
         l2announcements:
           enabled: true
 
