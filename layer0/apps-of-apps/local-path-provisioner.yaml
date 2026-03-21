@@ -1,0 +1,20 @@
+apiVersion: argoproj.io/v1alpha1
+kind: Application
+metadata:
+  name: local-path-provisioner
+  namespace: argocd
+  finalizers:
+    - resources-finalizer.argocd.argoproj.io
+spec:
+  destination:
+    namespace: local-path-storage
+    server: https://kubernetes.default.svc
+  project: default
+  source:
+    path: layer0/apps/local-path-provisioner
+    repoURL: https://github.com/s1monb/homelab.git
+    targetRevision: main
+  syncPolicy:
+    automated:
+      prune: true
+      selfHeal: true
