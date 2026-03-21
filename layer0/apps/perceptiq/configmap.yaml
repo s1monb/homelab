@@ -1,0 +1,9 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: perceptiq
+  namespace: perceptiq
+data:
+  APIFY_ACTOR_ID: "compass~google-maps-reviews-scraper"
+  APIFY_MAX_REVIEWS: "1000"
+  APIFY_SYNC_TIMEOUT_MINUTES: "20"

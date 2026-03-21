@@ -1,0 +1,11 @@
+apiVersion: v1
+kind: Service
+metadata:
+  name: perceptiq
+  namespace: perceptiq
+spec:
+  selector:
+    app: perceptiq
+  ports:
+    - port: 80
+      targetPort: 3000
