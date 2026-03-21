@@ -40,6 +40,23 @@ spec:
             - NET_ADMIN
             - SYS_ADMIN
             - SYS_RESOURCE
+
+        # Increase rate limit when doing L2 announcements
+        k8sClientRateLimit:
+          qps: 20
+          burst: 100
+
+        l2announcements:
+          enabled: true
+
+        externalIPs:
+          enabled: true
+
+        enableCiliumEndpointSlice: true
+
+        loadBalancer:
+          # https://docs.cilium.io/en/stable/network/kubernetes/kubeproxy-free/#maglev-consistent-hashing
+          algorithm: maglev
   destination:
     server: "https://kubernetes.default.svc"
     namespace: kube-system
