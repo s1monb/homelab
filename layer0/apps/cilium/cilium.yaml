@@ -52,11 +52,8 @@ spec:
         externalIPs:
           enabled: true
 
-        enableCiliumEndpointSlice: true
-
-        loadBalancer:
-          # https://docs.cilium.io/en/stable/network/kubernetes/kubeproxy-free/#maglev-consistent-hashing
-          algorithm: maglev
+        operator:
+          replicas: 1
   destination:
     server: "https://kubernetes.default.svc"
     namespace: kube-system
