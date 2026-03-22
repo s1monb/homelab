@@ -15,6 +15,15 @@ spec:
         crds:
           annotations: 
             argocd.argoproj.io/sync-options: Replace=true
+        server:
+          extraArgs:
+            - --insecure
+          ingress:
+            enabled: true
+            annotations:
+              cert-manager.io/cluster-issuer: letsencrypt-prod
+            hostname: argocd.valley.no
+            tls: true
   destination:
     server: "https://kubernetes.default.svc"
     namespace: argocd
