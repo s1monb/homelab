@@ -86,10 +86,10 @@ spec:
                   value: "perceptiq-preview-{{.number}}"
                 - op: replace
                   path: /spec/tls/0/hosts/0
-                  value: "{{.branch_slug}}.preview.perceptiq.valley.no"
+                  value: "{{.branch_slug}}.preview.perceptiq.no"
                 - op: replace
                   path: /spec/rules/0/host
-                  value: "{{.branch_slug}}.preview.perceptiq.valley.no"
+                  value: "{{.branch_slug}}.preview.perceptiq.no"
       destination:
         server: https://kubernetes.default.svc
         namespace: "perceptiq-preview-{{.number}}"

@@ -8,22 +8,9 @@ metadata:
 spec:
   tls:
     - hosts:
-        - perceptiq.valley.no
-      secretName: perceptiq-tls
-    - hosts:
         - perceptiq.no
       secretName: perceptiq-no-tls
   rules:
-    - host: perceptiq.valley.no
-      http:
-        paths:
-          - path: /
-            pathType: Prefix
-            backend:
-              service:
-                name: perceptiq
-                port:
-                  number: 80
     - host: perceptiq.no
       http:
         paths:
