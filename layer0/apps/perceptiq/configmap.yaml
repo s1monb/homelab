@@ -9,4 +9,4 @@ data:
   APIFY_SYNC_TIMEOUT_MINUTES: "20"
   CLERK_ISSUER: "https://enhanced-raven-64.clerk.accounts.dev"
   CLERK_JWKS_URL: "https://enhanced-raven-64.clerk.accounts.dev/.well-known/jwks.json"
-  VITE_CLERK_PUBLISHABLE_KEY: "pk_live_Y2xlcmsucGVyY2VwdGlxLm5vJA"
+  VITE_CLERK_PUBLISHABLE_KEY: "pk_test_ZW5oYW5jZWQtcmF2ZW4tNjQuY2xlcmsuYWNjb3VudHMuZGV2JA"
