@@ -28,7 +28,7 @@ spec:
         targetRevision: main
         kustomize:
           images:
-            - "ghcr.io/s1monb/perceptiq={{.head_short_sha}}"
+            - "ghcr.io/s1monb/perceptiq:sha-{{.head_short_sha_7}}"
           patches:
             - target:
                 kind: Namespace
