@@ -14,8 +14,6 @@ spec:
           tokenRef:
             secretName: github-argocd-token
             key: token
-          labels:
-            - preview
         requeueAfterSeconds: 60
   template:
     metadata:
