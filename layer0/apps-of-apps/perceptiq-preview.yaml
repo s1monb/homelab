@@ -1,0 +1,103 @@
+apiVersion: argoproj.io/v1alpha1
+kind: ApplicationSet
+metadata:
+  name: perceptiq-preview
+  namespace: argocd
+spec:
+  goTemplate: true
+  goTemplatePatch: ""
+  generators:
+    - pullRequest:
+        github:
+          owner: s1monb
+          repo: perceptiq
+          tokenRef:
+            secretName: github-argocd-token
+            key: token
+          labels:
+            - preview
+        requeueAfterSeconds: 60
+  template:
+    metadata:
+      name: "perceptiq-preview-{{.number}}"
+    spec:
+      project: default
+      source:
+        path: layer0/apps/perceptiq-preview
+        repoURL: https://github.com/s1monb/homelab.git
+        targetRevision: main
+        kustomize:
+          images:
+            - "ghcr.io/s1monb/perceptiq={{.head_short_sha}}"
+          patches:
+            - target:
+                kind: Namespace
+                name: PREVIEW_NAMESPACE
+              patch: |
+                - op: replace
+                  path: /metadata/name
+                  value: "perceptiq-preview-{{.number}}"
+            - target:
+                kind: ConfigMap
+                name: perceptiq
+              patch: |
+                - op: replace
+                  path: /metadata/namespace
+                  value: "perceptiq-preview-{{.number}}"
+            - target:
+                kind: ExternalSecret
+                name: perceptiq-secrets
+              patch: |
+                - op: replace
+                  path: /metadata/namespace
+                  value: "perceptiq-preview-{{.number}}"
+            - target:
+                kind: ExternalSecret
+                name: ghcr-pull-secret
+              patch: |
+                - op: replace
+                  path: /metadata/namespace
+                  value: "perceptiq-preview-{{.number}}"
+            - target:
+                kind: Cluster
+                name: perceptiq-db
+              patch: |
+                - op: replace
+                  path: /metadata/namespace
+                  value: "perceptiq-preview-{{.number}}"
+            - target:
+                kind: Deployment
+                name: perceptiq
+              patch: |
+                - op: replace
+                  path: /metadata/namespace
+                  value: "perceptiq-preview-{{.number}}"
+            - target:
+                kind: Service
+                name: perceptiq
+              patch: |
+                - op: replace
+                  path: /metadata/namespace
+                  value: "perceptiq-preview-{{.number}}"
+            - target:
+                kind: Ingress
+                name: perceptiq
+              patch: |
+                - op: replace
+                  path: /metadata/namespace
+                  value: "perceptiq-preview-{{.number}}"
+                - op: replace
+                  path: /spec/tls/0/hosts/0
+                  value: "{{.branch_slug}}.preview.perceptiq.valley.no"
+                - op: replace
+                  path: /spec/rules/0/host
+                  value: "{{.branch_slug}}.preview.perceptiq.valley.no"
+      destination:
+        server: https://kubernetes.default.svc
+        namespace: "perceptiq-preview-{{.number}}"
+      syncPolicy:
+        automated:
+          prune: true
+          selfHeal: true
+        syncOptions:
+          - CreateNamespace=true

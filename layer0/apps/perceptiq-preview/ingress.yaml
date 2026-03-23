@@ -1,0 +1,23 @@
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  name: perceptiq
+  namespace: PREVIEW_NAMESPACE
+  annotations:
+    cert-manager.io/cluster-issuer: letsencrypt-prod
+spec:
+  tls:
+    - hosts:
+        - PREVIEW_HOST
+      secretName: perceptiq-preview-tls
+  rules:
+    - host: PREVIEW_HOST
+      http:
+        paths:
+          - path: /
+            pathType: Prefix
+            backend:
+              service:
+                name: perceptiq
+                port:
+                  number: 80
