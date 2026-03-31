@@ -57,6 +57,27 @@ spec:
                   path: /metadata/namespace
                   value: "perceptiq-preview-{{.number}}"
             - target:
+                kind: ExternalSecret
+                name: gcp-nlp
+              patch: |
+                - op: replace
+                  path: /metadata/namespace
+                  value: "perceptiq-preview-{{.number}}"
+            - target:
+                kind: Deployment
+                name: redis
+              patch: |
+                - op: replace
+                  path: /metadata/namespace
+                  value: "perceptiq-preview-{{.number}}"
+            - target:
+                kind: Service
+                name: redis
+              patch: |
+                - op: replace
+                  path: /metadata/namespace
+                  value: "perceptiq-preview-{{.number}}"
+            - target:
                 kind: Cluster
                 name: perceptiq-db
               patch: |

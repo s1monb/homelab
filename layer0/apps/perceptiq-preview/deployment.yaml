@@ -17,6 +17,10 @@ spec:
     spec:
       imagePullSecrets:
         - name: ghcr-pull-secret
+      volumes:
+        - name: gcp-sa-key
+          secret:
+            secretName: gcp-nlp
       containers:
         - name: perceptiq
           image: ghcr.io/s1monb/perceptiq:latest
@@ -34,6 +38,10 @@ spec:
                 name: perceptiq-secrets
             - configMapRef:
                 name: perceptiq
+          volumeMounts:
+            - name: gcp-sa-key
+              mountPath: /etc/gcp
+              readOnly: true
           livenessProbe:
             httpGet:
               path: /api/health
