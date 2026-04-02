@@ -1,0 +1,85 @@
+apiVersion: argoproj.io/v1alpha1
+kind: Application
+metadata:
+  name: sentry
+  namespace: argocd
+  finalizers:
+    - resources-finalizer.argocd.argoproj.io
+  annotations:
+    argocd.argoproj.io/sync-wave: "-1"
+spec:
+  destination:
+    namespace: sentry
+    server: https://kubernetes.default.svc
+  project: default
+  source:
+    chart: sentry
+    repoURL: https://sentry-kubernetes.github.io/charts
+    targetRevision: 29.5.1
+    helm:
+      releaseName: sentry
+      values: |
+        auth:
+          register: false
+
+        user:
+          create: true
+          email: admin@sentry.valley.no
+          existingSecret: sentry-secrets
+          existingSecretKey: admin-password
+
+        externalClickhouse:
+          host: sentry-clickhouse.sentry.svc.cluster.local
+          tcpPort: 9000
+          httpPort: 8123
+          username: default
+          database: default
+          singleNode: true
+          existingSecret: sentry-secrets
+          existingSecretKey: clickhouse-password
+
+        config:
+          configYml:
+            system.url: "https://sentry.valley.no"
+
+        ingress:
+          enabled: true
+          ingressClassName: cilium
+          hostname: sentry.valley.no
+          annotations:
+            cert-manager.io/cluster-issuer: letsencrypt-prod
+          tls:
+            - secretName: sentry-tls
+              hosts:
+                - sentry.valley.no
+
+        postgresql:
+          primary:
+            persistence:
+              storageClass: local-path
+              size: 20Gi
+
+        redis:
+          master:
+            persistence:
+              storageClass: local-path
+              size: 8Gi
+
+        kafka:
+          controller:
+            replicaCount: 1
+          provisioning:
+            replicationFactor: 1
+
+        filestore:
+          filesystem:
+            persistence:
+              storageClassName: local-path
+              size: 20Gi
+  syncPolicy:
+    automated:
+      prune: true
+      selfHeal: true
+    syncOptions:
+      - CreateNamespace=true
+      - ServerSideApply=true
