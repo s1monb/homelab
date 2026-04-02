@@ -1,0 +1,83 @@
+apiVersion: argoproj.io/v1alpha1
+kind: Application
+metadata:
+  name: otel-collector
+  namespace: argocd
+  finalizers:
+    - resources-finalizer.argocd.argoproj.io
+spec:
+  destination:
+    namespace: monitoring
+    server: https://kubernetes.default.svc
+  project: default
+  source:
+    chart: opentelemetry-collector
+    repoURL: https://open-telemetry.github.io/opentelemetry-helm-charts
+    targetRevision: 0.147.1
+    helm:
+      releaseName: otel-collector
+      values: |
+        mode: daemonset
+
+        image:
+          repository: otel/opentelemetry-collector-k8s
+
+        presets:
+          logsCollection:
+            enabled: true
+          kubernetesAttributes:
+            enabled: true
+          kubeletMetrics:
+            enabled: true
+
+        config:
+          receivers:
+            prometheus:
+              config:
+                scrape_configs:
+                  - job_name: kube-state-metrics
+                    scrape_interval: 60s
+                    static_configs:
+                      - targets:
+                          - kube-state-metrics.monitoring.svc:8080
+                  - job_name: node-exporter
+                    scrape_interval: 60s
+                    static_configs:
+                      - targets:
+                          - node-exporter.monitoring.svc:9100
+
+          processors:
+            batch:
+              timeout: 10s
+              send_batch_size: 1024
+            memory_limiter:
+              check_interval: 5s
+              limit_percentage: 80
+              spike_limit_percentage: 25
+
+          exporters:
+            otlphttp/mimir:
+              endpoint: http://mimir.monitoring.svc:9009/otlp
+              tls:
+                insecure: true
+            otlphttp/loki:
+              endpoint: http://loki.monitoring.svc:3100/otlp
+              tls:
+                insecure: true
+
+          service:
+            pipelines:
+              metrics:
+                receivers: [prometheus, kubeletstats]
+                processors: [memory_limiter, k8sattributes, batch]
+                exporters: [otlphttp/mimir]
+              logs:
+                receivers: [filelog]
+                processors: [memory_limiter, k8sattributes, batch]
+                exporters: [otlphttp/loki]
+  syncPolicy:
+    automated:
+      prune: true
+      selfHeal: true
+    syncOptions:
+      - CreateNamespace=true

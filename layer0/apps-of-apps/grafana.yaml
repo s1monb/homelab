@@ -1,0 +1,61 @@
+apiVersion: argoproj.io/v1alpha1
+kind: Application
+metadata:
+  name: grafana
+  namespace: argocd
+  finalizers:
+    - resources-finalizer.argocd.argoproj.io
+spec:
+  destination:
+    namespace: monitoring
+    server: https://kubernetes.default.svc
+  project: default
+  source:
+    chart: grafana
+    repoURL: https://grafana.github.io/helm-charts
+    targetRevision: 10.5.8
+    helm:
+      releaseName: grafana
+      values: |
+        admin:
+          existingSecret: grafana-admin
+          userKey: admin-user
+          passwordKey: admin-password
+
+        persistence:
+          enabled: true
+          storageClassName: local-path
+          size: 5Gi
+
+        ingress:
+          enabled: true
+          annotations:
+            cert-manager.io/cluster-issuer: letsencrypt-prod
+          hosts:
+            - grafana.valley.no
+          tls:
+            - hosts:
+                - grafana.valley.no
+              secretName: grafana-tls
+
+        datasources:
+          datasources.yaml:
+            apiVersion: 1
+            datasources:
+              - name: Mimir
+                type: prometheus
+                url: http://mimir.monitoring.svc:9009/prometheus
+                access: proxy
+                isDefault: true
+                jsonData:
+                  timeInterval: 60s
+              - name: Loki
+                type: loki
+                url: http://loki.monitoring.svc:3100
+                access: proxy
+  syncPolicy:
+    automated:
+      prune: true
+      selfHeal: true
+    syncOptions:
+      - CreateNamespace=true

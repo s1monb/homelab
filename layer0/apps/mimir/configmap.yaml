@@ -1,0 +1,64 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: mimir-config
+  namespace: monitoring
+data:
+  mimir.yaml: |
+    multitenancy_enabled: false
+
+    server:
+      http_listen_port: 9009
+      log_level: warn
+
+    common:
+      storage:
+        backend: filesystem
+        filesystem:
+          dir: /data
+
+    blocks_storage:
+      backend: filesystem
+      filesystem:
+        dir: /data/blocks
+      tsdb:
+        dir: /data/tsdb
+      bucket_store:
+        sync_dir: /data/tsdb-sync
+
+    compactor:
+      data_dir: /data/compactor
+      sharding_ring:
+        kvstore:
+          store: memberlist
+
+    distributor:
+      ring:
+        instance_addr: 127.0.0.1
+        kvstore:
+          store: memberlist
+
+    ingester:
+      ring:
+        instance_addr: 127.0.0.1
+        kvstore:
+          store: memberlist
+        replication_factor: 1
+
+    store_gateway:
+      sharding_ring:
+        replication_factor: 1
+
+    ruler:
+      rule_path: /data/data-ruler
+
+    ruler_storage:
+      backend: filesystem
+      filesystem:
+        dir: /data/rules
+
+    activity_tracker:
+      filepath: /data/metrics-activity.log
+
+    limits:
+      native_histograms_ingestion_enabled: true
