@@ -1,0 +1,80 @@
+apiVersion: v1
+kind: Service
+metadata:
+  name: sentry-clickhouse
+  namespace: sentry
+  annotations:
+    argocd.argoproj.io/sync-wave: "-1"
+spec:
+  clusterIP: None
+  ports:
+    - name: http
+      port: 8123
+      targetPort: http
+    - name: native
+      port: 9000
+      targetPort: native
+  selector:
+    app: sentry-clickhouse
+---
+apiVersion: apps/v1
+kind: StatefulSet
+metadata:
+  name: sentry-clickhouse
+  namespace: sentry
+  annotations:
+    argocd.argoproj.io/sync-wave: "-1"
+spec:
+  serviceName: sentry-clickhouse
+  replicas: 1
+  selector:
+    matchLabels:
+      app: sentry-clickhouse
+  template:
+    metadata:
+      labels:
+        app: sentry-clickhouse
+    spec:
+      containers:
+        - name: clickhouse
+          image: clickhouse/clickhouse-server:24.8-alpine
+          ports:
+            - name: http
+              containerPort: 8123
+            - name: native
+              containerPort: 9000
+          env:
+            - name: CLICKHOUSE_DEFAULT_ACCESS_MANAGEMENT
+              value: "1"
+            - name: CLICKHOUSE_USER
+              value: default
+            - name: CLICKHOUSE_PASSWORD
+              valueFrom:
+                secretKeyRef:
+                  name: sentry-secrets
+                  key: clickhouse-password
+          volumeMounts:
+            - name: data
+              mountPath: /var/lib/clickhouse
+          readinessProbe:
+            httpGet:
+              path: /ping
+              port: http
+            initialDelaySeconds: 10
+            periodSeconds: 5
+          resources:
+            requests:
+              cpu: 500m
+              memory: 1Gi
+            limits:
+              memory: 4Gi
+  volumeClaimTemplates:
+    - metadata:
+        name: data
+      spec:
+        accessModes:
+          - ReadWriteOnce
+        storageClassName: local-path
+        resources:
+          requests:
+            storage: 50Gi
