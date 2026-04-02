@@ -5,6 +5,8 @@ resources:
   - configmap.yaml
   - externalsecret.yaml
   - ghcr-pull-secret.yaml
+  - redis.yaml
+  - gcp-nlp-secret.yaml
   - postgres.yaml
   - deployment.yaml
   - service.yaml
