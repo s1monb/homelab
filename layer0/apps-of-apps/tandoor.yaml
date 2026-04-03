@@ -1,17 +1,17 @@
 apiVersion: argoproj.io/v1alpha1
 kind: Application
 metadata:
-  name: grocy
+  name: tandoor
   namespace: argocd
   finalizers:
     - resources-finalizer.argocd.argoproj.io
 spec:
   destination:
-    namespace: grocy
+    namespace: tandoor
     server: https://kubernetes.default.svc
   project: default
   source:
-    path: layer0/apps/grocy
+    path: layer0/apps/tandoor
     repoURL: https://github.com/s1monb/homelab.git
     targetRevision: main
   syncPolicy:
