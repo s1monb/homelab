@@ -1,11 +1,11 @@
 apiVersion: v1
 kind: Service
 metadata:
-  name: grocy
-  namespace: grocy
+  name: tandoor
+  namespace: tandoor
 spec:
   selector:
-    app: grocy
+    app: tandoor
   ports:
     - name: http
       port: 80

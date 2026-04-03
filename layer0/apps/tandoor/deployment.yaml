@@ -1,0 +1,74 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: tandoor
+  namespace: tandoor
+  labels:
+    app: tandoor
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: tandoor
+  template:
+    metadata:
+      labels:
+        app: tandoor
+    spec:
+      securityContext:
+        fsGroup: 1000
+      containers:
+        - name: tandoor
+          image: vabene1111/recipes:2.6.4
+          imagePullPolicy: IfNotPresent
+          ports:
+            - containerPort: 80
+              name: http
+          env:
+            - name: TZ
+              value: Europe/Oslo
+            - name: ALLOWED_HOSTS
+              value: food.valley.no
+            - name: CSRF_TRUSTED_ORIGINS
+              value: https://food.valley.no
+            - name: ALLAUTH_TRUSTED_PROXY_COUNT
+              value: "2"
+            - name: DATABASE_URL
+              valueFrom:
+                secretKeyRef:
+                  name: tandoor-db-app
+                  key: uri
+          envFrom:
+            - secretRef:
+                name: tandoor-secrets
+          volumeMounts:
+            - name: media
+              mountPath: /opt/recipes/mediafiles
+          startupProbe:
+            httpGet:
+              path: /
+              port: http
+            failureThreshold: 36
+            periodSeconds: 10
+          livenessProbe:
+            httpGet:
+              path: /
+              port: http
+            periodSeconds: 30
+          readinessProbe:
+            httpGet:
+              path: /
+              port: http
+            initialDelaySeconds: 5
+            periodSeconds: 15
+          resources:
+            requests:
+              cpu: 100m
+              memory: 512Mi
+            limits:
+              cpu: "2"
+              memory: 2Gi
+      volumes:
+        - name: media
+          persistentVolumeClaim:
+            claimName: tandoor-media
