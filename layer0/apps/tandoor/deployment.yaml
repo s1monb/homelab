@@ -51,17 +51,26 @@ spec:
             httpGet:
               path: /
               port: http
+              httpHeaders:
+                - name: Host
+                  value: food.valley.no
             failureThreshold: 36
             periodSeconds: 10
           livenessProbe:
             httpGet:
               path: /
               port: http
+              httpHeaders:
+                - name: Host
+                  value: food.valley.no
             periodSeconds: 30
           readinessProbe:
             httpGet:
               path: /
               port: http
+              httpHeaders:
+                - name: Host
+                  value: food.valley.no
             initialDelaySeconds: 5
             periodSeconds: 15
           resources:
