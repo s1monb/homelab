@@ -15,6 +15,9 @@ spec:
       labels:
         app: tandoor
     spec:
+      # Avoid kube injecting TANDOOR_PORT=tcp://... from the Service named "tandoor",
+      # which breaks nginx (listen expects a port number, not a docker-style URL).
+      enableServiceLinks: false
       securityContext:
         fsGroup: 1000
       containers:
