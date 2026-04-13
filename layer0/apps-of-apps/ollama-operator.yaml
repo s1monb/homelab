@@ -11,9 +11,9 @@ spec:
     server: https://kubernetes.default.svc
   project: default
   source:
-    repoURL: https://github.com/nekomeowww/ollama-operator.git
-    path: dist
-    targetRevision: v0.10.10
+    repoURL: https://github.com/s1monb/homelab.git
+    path: layer0/apps/ollama-operator
+    targetRevision: main
   syncPolicy:
     automated:
       prune: true
