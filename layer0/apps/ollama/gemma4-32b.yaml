@@ -1,0 +1,7 @@
+apiVersion: ollama.ayaka.io/v1
+kind: Model
+metadata:
+  name: gemma4-32b
+  namespace: ollama
+spec:
+  image: gemma4:32b
