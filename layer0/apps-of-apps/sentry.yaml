@@ -19,6 +19,9 @@ spec:
     helm:
       releaseName: sentry
       values: |
+        hooks:
+          activeDeadlineSeconds: 600
+
         auth:
           register: false
 
