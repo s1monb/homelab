@@ -6,6 +6,17 @@ metadata:
   finalizers:
   - resources-finalizer.argocd.argoproj.io
 spec:
+  ignoreDifferences:
+    - group: argoproj.io
+      kind: ApplicationSet
+      name: perceptiq-preview
+      jqPathExpressions:
+        - .metadata.annotations["argocd.argoproj.io/tracking-id"]
+    - group: argoproj.io
+      kind: ApplicationSet
+      name: perceptiq-preview
+      jsonPointers:
+        - /spec/goTemplatePatch
   destination:
     namespace: argocd
     server: https://kubernetes.default.svc
