@@ -23,7 +23,7 @@ spec:
             secretName: gcp-nlp
       containers:
         - name: perceptiq-lab
-          image: ghcr.io/s1monb/perceptiq-lab:v0.3.0
+          image: ghcr.io/s1monb/perceptiq-lab:v0.4.0
           imagePullPolicy: Always
           ports:
             - containerPort: 3000
