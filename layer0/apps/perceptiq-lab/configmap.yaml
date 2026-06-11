@@ -1,0 +1,12 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: perceptiq-lab
+  namespace: perceptiq-lab
+data:
+  NODE_ENV: "production"
+  APIFY_ACTOR_ID: "compass~google-maps-reviews-scraper"
+  APIFY_MAX_REVIEWS: "1000"
+  APIFY_SYNC_TIMEOUT_MINUTES: "20"
+  GOOGLE_APPLICATION_CREDENTIALS: "/etc/gcp/sa-key.json"
+  GOOGLE_CLOUD_PROJECT: "perceptiq"

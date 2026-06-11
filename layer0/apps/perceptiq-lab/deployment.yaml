@@ -1,0 +1,63 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: perceptiq-lab
+  namespace: perceptiq-lab
+  labels:
+    app: perceptiq-lab
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: perceptiq-lab
+  template:
+    metadata:
+      labels:
+        app: perceptiq-lab
+    spec:
+      imagePullSecrets:
+        - name: ghcr-pull-secret
+      volumes:
+        - name: gcp-sa-key
+          secret:
+            secretName: gcp-nlp
+      containers:
+        - name: perceptiq-lab
+          image: ghcr.io/s1monb/perceptiq-lab:0.1.0
+          imagePullPolicy: Always
+          ports:
+            - containerPort: 3000
+          env:
+            - name: DATABASE_URL
+              valueFrom:
+                secretKeyRef:
+                  name: perceptiq-lab-db-app
+                  key: uri
+          envFrom:
+            - secretRef:
+                name: perceptiq-lab-secrets
+            - configMapRef:
+                name: perceptiq-lab
+          volumeMounts:
+            - name: gcp-sa-key
+              mountPath: /etc/gcp
+              readOnly: true
+          livenessProbe:
+            httpGet:
+              path: /api/health
+              port: 3000
+            initialDelaySeconds: 10
+            periodSeconds: 15
+          readinessProbe:
+            httpGet:
+              path: /api/health
+              port: 3000
+            initialDelaySeconds: 5
+            periodSeconds: 5
+          resources:
+            requests:
+              cpu: 50m
+              memory: 128Mi
+            limits:
+              cpu: 500m
+              memory: 512Mi

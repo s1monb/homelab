@@ -1,0 +1,16 @@
+apiVersion: argocd-image-updater.argoproj.io/v1alpha1
+kind: ImageUpdater
+metadata:
+  name: perceptiq-lab
+  namespace: argocd
+spec:
+  commonUpdateSettings:
+    updateStrategy: semver
+    pullSecret: pullsecret:argocd/ghcr-image-updater-creds
+  writeBackConfig:
+    method: argocd
+  applicationRefs:
+    - namePattern: perceptiq-lab
+      images:
+        - alias: perceptiq-lab
+          imageName: ghcr.io/s1monb/perceptiq-lab

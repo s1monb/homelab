@@ -1,0 +1,14 @@
+apiVersion: postgresql.cnpg.io/v1
+kind: Cluster
+metadata:
+  name: perceptiq-lab-db
+  namespace: perceptiq-lab
+spec:
+  instances: 1
+  storage:
+    size: 5Gi
+    storageClass: local-path
+  bootstrap:
+    initdb:
+      database: perceptiq_lab
+      owner: perceptiq_lab

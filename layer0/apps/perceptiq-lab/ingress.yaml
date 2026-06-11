@@ -1,0 +1,24 @@
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  name: perceptiq-lab
+  namespace: perceptiq-lab
+  annotations:
+    cert-manager.io/cluster-issuer: letsencrypt-prod
+spec:
+  ingressClassName: cilium
+  tls:
+    - hosts:
+        - lab.perceptiq.no
+      secretName: lab-perceptiq-no-tls
+  rules:
+    - host: lab.perceptiq.no
+      http:
+        paths:
+          - path: /
+            pathType: Prefix
+            backend:
+              service:
+                name: perceptiq-lab
+                port:
+                  number: 80
