@@ -9,10 +9,10 @@ spec:
   ingressClassName: cilium
   tls:
     - hosts:
-        - lab.perceptiq.no
-      secretName: lab-perceptiq-no-tls
+        - perceptiq-lab.valley.no
+      secretName: perceptiq-lab-valley-no-tls
   rules:
-    - host: lab.perceptiq.no
+    - host: perceptiq-lab.valley.no
       http:
         paths:
           - path: /
