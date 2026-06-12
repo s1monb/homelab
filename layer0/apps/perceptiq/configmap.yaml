@@ -5,6 +5,8 @@ metadata:
   namespace: perceptiq
 data:
   APIFY_ACTOR_ID: "compass~google-maps-reviews-scraper"
+  APIFY_ACTOR_ID_APIFY_FACEBOOK: "apify/facebook-reviews-scraper"
+  APIFY_ACTOR_ID_APIFY_TRUSTPILOT: "automation-lab/trustpilot"
   APIFY_MAX_REVIEWS: "1000"
   APIFY_SYNC_TIMEOUT_MINUTES: "20"
   CLERK_ISSUER: "https://enhanced-raven-64.clerk.accounts.dev"
