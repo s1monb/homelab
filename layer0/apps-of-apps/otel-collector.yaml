@@ -19,6 +19,9 @@ spec:
       values: |
         mode: daemonset
 
+        service:
+          enabled: true
+
         image:
           repository: otel/opentelemetry-collector-k8s
 
@@ -68,11 +71,11 @@ spec:
           service:
             pipelines:
               metrics:
-                receivers: [prometheus, kubeletstats]
+                receivers: [otlp, prometheus, kubeletstats]
                 processors: [memory_limiter, k8sattributes, batch]
                 exporters: [otlphttp/mimir]
               logs:
-                receivers: [filelog]
+                receivers: [otlp, filelog]
                 processors: [memory_limiter, k8sattributes, batch]
                 exporters: [otlphttp/loki]
   syncPolicy:
