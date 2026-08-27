@@ -1,7 +1,9 @@
 apiVersion: kustomize.config.k8s.io/v1beta1
 kind: Kustomization
 resources:
-  - https://github.com/nekomeowww/ollama-operator/releases/download/v0.10.10/install.yaml
+  # The release-asset URL 404s and kustomize treats github.com as a git host;
+  # pull the pinned install manifest from raw.githubusercontent instead.
+  - https://raw.githubusercontent.com/nekomeowww/ollama-operator/v0.10.10/dist/install.yaml
 images:
   - name: gcr.io/kubebuilder/kube-rbac-proxy
     newName: registry.k8s.io/kubebuilder/kube-rbac-proxy
