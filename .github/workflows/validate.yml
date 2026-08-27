@@ -1,0 +1,57 @@
+name: Validate manifests
+
+on:
+  pull_request:
+  push:
+    branches: [main]
+
+jobs:
+  validate:
+    name: Kustomize build + YAML syntax
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Install kustomize
+        run: |
+          curl -sSfL "https://raw.githubusercontent.com/kubernetes-sigs/kustomize/master/hack/install_kustomize.sh" | bash
+          sudo mv kustomize /usr/local/bin/kustomize
+          kustomize version
+
+      - name: Build every kustomization
+        run: |
+          set -uo pipefail
+          fail=0
+          while IFS= read -r kfile; do
+            dir=$(dirname "$kfile")
+            echo "::group::kustomize build $dir"
+            if kustomize build --enable-helm "$dir" >/dev/null; then
+              echo "ok: $dir"
+            else
+              echo "::error::kustomize build failed for $dir"
+              fail=1
+            fi
+            echo "::endgroup::"
+          done < <(find layer0 -name kustomization.yaml | sort)
+          exit $fail
+
+      - name: Validate YAML syntax
+        run: |
+          python3 -m pip install --quiet pyyaml
+          python3 - <<'PY'
+          import glob, sys, yaml
+          files = sorted(
+              glob.glob('layer0/**/*.yaml', recursive=True)
+              + glob.glob('layer0/**/*.yml', recursive=True)
+          )
+          bad = 0
+          for f in files:
+              try:
+                  with open(f) as fh:
+                      list(yaml.safe_load_all(fh))
+              except yaml.YAMLError as e:
+                  print(f"::error file={f}::YAML parse error: {e}")
+                  bad = 1
+          print(f"checked {len(files)} yaml files")
+          sys.exit(bad)
+          PY
