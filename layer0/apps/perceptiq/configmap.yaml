@@ -12,6 +12,10 @@ data:
   CLERK_ISSUER: "https://enhanced-raven-64.clerk.accounts.dev"
   CLERK_JWKS_URL: "https://enhanced-raven-64.clerk.accounts.dev/.well-known/jwks.json"
   VITE_CLERK_PUBLISHABLE_KEY: "pk_test_ZW5oYW5jZWQtcmF2ZW4tNjQuY2xlcmsuYWNjb3VudHMuZGV2JA"
+  # Absolute base for URLs we hand to third parties — notably Stripe checkout
+  # and billing-portal redirects. Without it those fall back to localhost, which
+  # sends a production user to their own machine after paying.
+  FRONTEND_URL: "https://perceptiq.no"
   GOOGLE_APPLICATION_CREDENTIALS: "/etc/gcp/sa-key.json"
   GOOGLE_CLOUD_PROJECT: "perceptiq"
   # Worker fleet: each step is handled by its standalone worker instead of
