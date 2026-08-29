@@ -35,9 +35,26 @@ spec:
 
         config:
           receivers:
+            # Talos issues the kubelet a serving cert with no IP SANs, and the
+            # kubeletMetrics preset dials the node by IP — so every scrape of
+            # /stats/summary has been failing TLS verification since this was
+            # deployed, and no pod-level CPU/memory has ever reached Mimir.
+            # Connecting by node name instead would need node hostnames to be
+            # resolvable from pods, which they are not here.
+            kubeletstats:
+              insecure_skip_verify: true
+
             prometheus:
               config:
                 scrape_configs:
+                  # NOTE: the cluster is a single node, so scraping these
+                  # cluster-wide targets from a daemonset yields exactly one
+                  # scrape. If a second node is ever added, every collector
+                  # would scrape them too — duplicating series for the static
+                  # jobs and randomly load-balancing node-exporter. Add a
+                  # `__meta_kubernetes_pod_node_name` keep filter (against the
+                  # K8S_NODE_NAME env var the chart injects) before growing the
+                  # cluster.
                   - job_name: kube-state-metrics
                     scrape_interval: 60s
                     static_configs:
@@ -48,6 +65,82 @@ spec:
                     static_configs:
                       - targets:
                           - node-exporter.monitoring.svc:9100
+
+                  # NATS JetStream. The chart already runs a
+                  # prometheus-nats-exporter sidecar on port 7777, but only
+                  # wires it up to a PodMonitor — and nothing consumes those
+                  # here (there is no Prometheus Operator), so the exporter was
+                  # running unscraped. No Service exposes 7777 either, hence
+                  # pod discovery rather than a static target.
+                  #
+                  # Gives us per-consumer nats_consumer_num_pending /
+                  # num_ack_pending / num_redelivered / last_ack_seconds keyed
+                  # by consumer_name + stream_name — i.e. the backlog and
+                  # liveness of the whole PerceptIQ worker pipeline.
+                  - job_name: nats
+                    scrape_interval: 60s
+                    kubernetes_sd_configs:
+                      - role: pod
+                        namespaces:
+                          names:
+                            - messaging
+                    relabel_configs:
+                      - source_labels:
+                          - __meta_kubernetes_pod_container_port_name
+                        regex: prom-metrics
+                        action: keep
+                      - source_labels:
+                          - __meta_kubernetes_pod_name
+                        target_label: instance
+
+                  # CloudNativePG exposes Postgres metrics on the `metrics`
+                  # container port of every instance pod. Discovered rather
+                  # than static because the pod IP changes on failover, and
+                  # namespace-wide so both perceptiq and perceptiq-lab are
+                  # picked up automatically.
+                  - job_name: cnpg
+                    scrape_interval: 60s
+                    kubernetes_sd_configs:
+                      - role: pod
+                    relabel_configs:
+                      - source_labels:
+                          - __meta_kubernetes_pod_label_cnpg_io_cluster
+                          - __meta_kubernetes_pod_container_port_name
+                        regex: .+;metrics
+                        action: keep
+                      - source_labels:
+                          - __meta_kubernetes_pod_label_cnpg_io_cluster
+                        target_label: cnpg_cluster
+                      - source_labels:
+                          - __meta_kubernetes_namespace
+                        target_label: namespace
+                      - source_labels:
+                          - __meta_kubernetes_pod_name
+                        target_label: instance
+
+                  # Cilium's Envoy already serves Prometheus metrics on 9964 —
+                  # no Cilium values change or daemonset rollout needed. This is
+                  # request rate, status class and a latency histogram per
+                  # Ingress backend, which is edge RED data for perceptiq.no
+                  # without instrumenting the app.
+                  #
+                  # The endpoint emits ~4.7k series, most of them Envoy
+                  # internals, so keep only the ingress-facing families and
+                  # only the cilium-ingress clusters.
+                  - job_name: cilium-envoy
+                    scrape_interval: 60s
+                    static_configs:
+                      - targets:
+                          - cilium-envoy.kube-system.svc:9964
+                    metric_relabel_configs:
+                      - source_labels:
+                          - __name__
+                        regex: envoy_cluster_upstream_rq_xx|envoy_cluster_upstream_rq_total|envoy_cluster_upstream_rq_timeout|envoy_cluster_upstream_rq_time_bucket|envoy_cluster_upstream_rq_time_count|envoy_cluster_upstream_rq_time_sum|envoy_cluster_upstream_cx_active|envoy_cluster_membership_healthy|envoy_cluster_membership_total
+                        action: keep
+                      - source_labels:
+                          - envoy_cluster_name
+                        regex: kube-system/cilium-ingress/.*
+                        action: keep
 
           processors:
             batch:

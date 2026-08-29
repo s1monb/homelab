@@ -19,3 +19,15 @@ data:
   FLEET_SENTIMENT_ENABLED: "true"
   FLEET_THEME_ENABLED: "true"
   FLEET_SCRAPER_ENABLED: "true"
+
+  # Scheduled review syncing. Paid locations refresh daily, free weekly; every
+  # Apify run is billed whether or not anything is new, so there is no
+  # user-facing "sync now". Both API replicas tick, but due locations are
+  # claimed atomically in one UPDATE, so a scrape can never be started twice.
+  SYNC_SCHEDULER_ENABLED: "true"
+  SYNC_INTERVAL_HOURS_PAID: "24"
+  SYNC_INTERVAL_HOURS_FREE: "168"
+  # Review budget for a paid location. Must stay above the free plan's 100,
+  # which is hardcoded in the API — reusing APIFY_MAX_REVIEWS for this once made
+  # upgrading fetch *fewer* reviews than the free plan.
+  APIFY_MAX_REVIEWS_PAID: "1000"

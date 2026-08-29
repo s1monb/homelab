@@ -41,11 +41,37 @@ spec:
                 - grafana.valley.no
               secretName: grafana-tls
 
+        # Discord webhook for the alert contact point below. Grafana
+        # interpolates ${VAR} in provisioning files from the process env, so the
+        # URL never lands in git.
+        envValueFrom:
+          DISCORD_ALERT_WEBHOOK_URL:
+            secretKeyRef:
+              name: grafana-discord
+              key: webhook-url
+
+        # Pick up dashboards from ConfigMaps labelled grafana_dashboard=1 so
+        # they are version-controlled rather than clicked together in the UI.
+        sidecar:
+          dashboards:
+            enabled: true
+            label: grafana_dashboard
+            labelValue: "1"
+            searchNamespace: monitoring
+            folderAnnotation: grafana_folder
+            provider:
+              foldersFromFilesStructure: true
+
         datasources:
           datasources.yaml:
             apiVersion: 1
             datasources:
+              # The UIDs are pinned to the values Grafana generated when these
+              # were first provisioned. Existing hand-built dashboards
+              # reference them, and so do the alert rules below, so they must
+              # not be allowed to change.
               - name: Mimir
+                uid: PAE45454D0EDB9216
                 type: prometheus
                 url: http://mimir.monitoring.svc:9009/prometheus
                 access: proxy
@@ -53,9 +79,452 @@ spec:
                 jsonData:
                   timeInterval: 60s
               - name: Loki
+                uid: P8E80F9AEF21F6940
                 type: loki
                 url: http://loki.monitoring.svc:3100
                 access: proxy
+
+        alerting:
+          contactpoints.yaml:
+            apiVersion: 1
+            contactPoints:
+              - orgId: 1
+                name: discord
+                receivers:
+                  - uid: discord-default
+                    type: discord
+                    settings:
+                      url: ${DISCORD_ALERT_WEBHOOK_URL}
+
+          policies.yaml:
+            apiVersion: 1
+            policies:
+              - orgId: 1
+                receiver: discord
+                group_by:
+                  - grafana_folder
+                  - alertname
+                group_wait: 30s
+                group_interval: 5m
+                repeat_interval: 12h
+
+          rules.yaml:
+            apiVersion: 1
+            groups:
+              - orgId: 1
+                name: perceptiq-availability
+                folder: PerceptIQ
+                interval: 1m
+                rules:
+                  - uid: pq-api-no-replicas
+                    title: PerceptIQ API has no available replicas
+                    condition: B
+                    for: 5m
+                    labels:
+                      severity: critical
+                      service: perceptiq
+                    annotations:
+                      summary: The perceptiq Deployment has had zero available replicas for 5 minutes.
+                      description: perceptiq.no is serving nothing. Check pods in the perceptiq namespace and the most recent ArgoCD sync.
+                    noDataState: Alerting
+                    execErrState: Alerting
+                    data:
+                      - refId: A
+                        relativeTimeRange:
+                          from: 600
+                          to: 0
+                        datasourceUid: PAE45454D0EDB9216
+                        model:
+                          refId: A
+                          editorMode: code
+                          instant: true
+                          range: false
+                          expr: kube_deployment_status_replicas_available{namespace="perceptiq", deployment="perceptiq"}
+                      - refId: B
+                        datasourceUid: __expr__
+                        model:
+                          refId: B
+                          type: threshold
+                          expression: A
+                          conditions:
+                            - evaluator:
+                                type: lt
+                                params:
+                                  - 1
+
+                  - uid: pq-worker-no-replicas
+                    title: PerceptIQ worker has no available replicas
+                    condition: B
+                    for: 10m
+                    labels:
+                      severity: critical
+                      service: perceptiq
+                    annotations:
+                      summary: A PerceptIQ worker Deployment has been at zero available replicas for 10 minutes.
+                      description: Review enrichment stops silently when a worker is down — the API keeps accepting work and JetStream just queues it. Check the worker pods in the perceptiq namespace.
+                    noDataState: OK
+                    execErrState: Alerting
+                    data:
+                      - refId: A
+                        relativeTimeRange:
+                          from: 900
+                          to: 0
+                        datasourceUid: PAE45454D0EDB9216
+                        model:
+                          refId: A
+                          editorMode: code
+                          instant: true
+                          range: false
+                          expr: kube_deployment_status_replicas_available{namespace="perceptiq", deployment=~"perceptiq-.*-worker"}
+                      - refId: B
+                        datasourceUid: __expr__
+                        model:
+                          refId: B
+                          type: threshold
+                          expression: A
+                          conditions:
+                            - evaluator:
+                                type: lt
+                                params:
+                                  - 1
+
+                  - uid: pq-pod-restarting
+                    title: PerceptIQ pod is restarting
+                    condition: B
+                    for: 5m
+                    labels:
+                      severity: warning
+                      service: perceptiq
+                    annotations:
+                      summary: A container in the perceptiq namespace restarted more than twice in 15 minutes.
+                      description: Usually an OOMKill against the tight memory limits (API 256Mi, workers 384-512Mi) or a crash on boot. Check the previous container logs.
+                    noDataState: OK
+                    execErrState: Alerting
+                    data:
+                      - refId: A
+                        relativeTimeRange:
+                          from: 900
+                          to: 0
+                        datasourceUid: PAE45454D0EDB9216
+                        model:
+                          refId: A
+                          editorMode: code
+                          instant: true
+                          range: false
+                          expr: increase(kube_pod_container_status_restarts_total{namespace="perceptiq"}[15m])
+                      - refId: B
+                        datasourceUid: __expr__
+                        model:
+                          refId: B
+                          type: threshold
+                          expression: A
+                          conditions:
+                            - evaluator:
+                                type: gt
+                                params:
+                                  - 2
+
+                  - uid: pq-postgres-down
+                    title: PerceptIQ Postgres is down
+                    condition: B
+                    for: 5m
+                    labels:
+                      severity: critical
+                      service: perceptiq
+                    annotations:
+                      summary: The CloudNativePG instance for perceptiq is not reporting healthy.
+                      description: Both the API and every worker write straight to this database. Check the perceptiq-db Cluster and its PVC.
+                    noDataState: Alerting
+                    execErrState: Alerting
+                    data:
+                      - refId: A
+                        relativeTimeRange:
+                          from: 600
+                          to: 0
+                        datasourceUid: PAE45454D0EDB9216
+                        model:
+                          refId: A
+                          editorMode: code
+                          instant: true
+                          range: false
+                          expr: cnpg_collector_up{namespace="perceptiq"}
+                      - refId: B
+                        datasourceUid: __expr__
+                        model:
+                          refId: B
+                          type: threshold
+                          expression: A
+                          conditions:
+                            - evaluator:
+                                type: lt
+                                params:
+                                  - 1
+
+              - orgId: 1
+                name: perceptiq-pipeline
+                folder: PerceptIQ
+                interval: 1m
+                rules:
+                  - uid: pq-consumer-stalled
+                    title: JetStream consumer is stalled with work queued
+                    condition: B
+                    for: 10m
+                    labels:
+                      severity: critical
+                      service: perceptiq
+                    annotations:
+                      summary: A JetStream consumer has pending messages but has not acked anything for 30 minutes.
+                      description: The worker behind this durable is wedged or crash-looping while messages queue up. This is the strongest single signal that review enrichment has stopped. A plain backlog threshold cannot catch it, because last_ack_seconds also grows harmlessly while the system is simply idle — hence the pending>0 conjunction.
+                    noDataState: OK
+                    execErrState: Alerting
+                    data:
+                      - refId: A
+                        relativeTimeRange:
+                          from: 900
+                          to: 0
+                        datasourceUid: PAE45454D0EDB9216
+                        model:
+                          refId: A
+                          editorMode: code
+                          instant: true
+                          range: false
+                          expr: nats_consumer_num_pending > 0 and on(consumer_name, stream_name) nats_consumer_last_ack_seconds > 1800
+                      - refId: B
+                        datasourceUid: __expr__
+                        model:
+                          refId: B
+                          type: threshold
+                          expression: A
+                          conditions:
+                            - evaluator:
+                                type: gt
+                                params:
+                                  - 0
+
+                  - uid: pq-consumer-backlog
+                    title: JetStream consumer backlog is not draining
+                    condition: B
+                    for: 30m
+                    labels:
+                      severity: warning
+                      service: perceptiq
+                    annotations:
+                      summary: A JetStream consumer has held more than 500 pending messages for 30 minutes.
+                      description: A large burst is normal right after a scrape (one sync can upsert up to APIFY_MAX_REVIEWS reviews, each fanning out to the sentiment and theme workers). Sustained backlog means the workers cannot keep up with the enrichment rate.
+                    noDataState: OK
+                    execErrState: Alerting
+                    data:
+                      - refId: A
+                        relativeTimeRange:
+                          from: 1800
+                          to: 0
+                        datasourceUid: PAE45454D0EDB9216
+                        model:
+                          refId: A
+                          editorMode: code
+                          instant: true
+                          range: false
+                          expr: nats_consumer_num_pending
+                      - refId: B
+                        datasourceUid: __expr__
+                        model:
+                          refId: B
+                          type: threshold
+                          expression: A
+                          conditions:
+                            - evaluator:
+                                type: gt
+                                params:
+                                  - 500
+
+                  - uid: pq-consumer-redelivery
+                    title: JetStream messages are being redelivered
+                    condition: B
+                    for: 10m
+                    labels:
+                      severity: warning
+                      service: perceptiq
+                    annotations:
+                      summary: A JetStream consumer is redelivering messages, so handlers are failing and naking.
+                      description: Workers nak on handler failure and give up after max_deliver, at which point the message is terminated and lost — there is no dead-letter stream. Catch the cause here before it turns into dropped work.
+                    noDataState: OK
+                    execErrState: Alerting
+                    data:
+                      - refId: A
+                        relativeTimeRange:
+                          from: 900
+                          to: 0
+                        datasourceUid: PAE45454D0EDB9216
+                        model:
+                          refId: A
+                          editorMode: code
+                          instant: true
+                          range: false
+                          expr: nats_consumer_num_redelivered
+                      - refId: B
+                        datasourceUid: __expr__
+                        model:
+                          refId: B
+                          type: threshold
+                          expression: A
+                          conditions:
+                            - evaluator:
+                                type: gt
+                                params:
+                                  - 5
+
+                  - uid: pq-jetstream-store-filling
+                    title: JetStream file store is filling up
+                    condition: B
+                    for: 15m
+                    labels:
+                      severity: warning
+                      service: perceptiq
+                    annotations:
+                      summary: JetStream is using more than 75 percent of its configured max storage.
+                      description: The streams are created with DiscardPolicy OLD, so reaching the cap silently discards the oldest messages rather than rejecting new ones. Measured at the account level because both streams are created with no per-stream byte limit (limit_bytes is -1).
+                    noDataState: OK
+                    execErrState: Alerting
+                    data:
+                      - refId: A
+                        relativeTimeRange:
+                          from: 1200
+                          to: 0
+                        datasourceUid: PAE45454D0EDB9216
+                        model:
+                          refId: A
+                          editorMode: code
+                          instant: true
+                          range: false
+                          expr: nats_varz_jetstream_stats_storage / nats_varz_jetstream_config_max_storage
+                      - refId: B
+                        datasourceUid: __expr__
+                        model:
+                          refId: B
+                          type: threshold
+                          expression: A
+                          conditions:
+                            - evaluator:
+                                type: gt
+                                params:
+                                  - 0.75
+
+              - orgId: 1
+                name: perceptiq-edge
+                folder: PerceptIQ
+                interval: 1m
+                rules:
+                  - uid: pq-ingress-5xx
+                    title: PerceptIQ ingress is serving 5xx
+                    condition: B
+                    for: 10m
+                    labels:
+                      severity: warning
+                      service: perceptiq
+                    annotations:
+                      summary: More than 5 percent of requests through the perceptiq ingress are returning 5xx.
+                      description: Measured at Cilium's Envoy, so this is what users actually receive. No data means no traffic at all, which is not an alertable condition here.
+                    noDataState: OK
+                    execErrState: OK
+                    data:
+                      - refId: A
+                        relativeTimeRange:
+                          from: 900
+                          to: 0
+                        datasourceUid: PAE45454D0EDB9216
+                        model:
+                          refId: A
+                          editorMode: code
+                          instant: true
+                          range: false
+                          expr: sum(rate(envoy_cluster_upstream_rq_xx{envoy_cluster_name="kube-system/cilium-ingress/perceptiq_perceptiq_80", envoy_response_code_class="5"}[10m])) / sum(rate(envoy_cluster_upstream_rq_xx{envoy_cluster_name="kube-system/cilium-ingress/perceptiq_perceptiq_80"}[10m]))
+                      - refId: B
+                        datasourceUid: __expr__
+                        model:
+                          refId: B
+                          type: threshold
+                          expression: A
+                          conditions:
+                            - evaluator:
+                                type: gt
+                                params:
+                                  - 0.05
+
+              - orgId: 1
+                name: perceptiq-logs
+                folder: PerceptIQ
+                interval: 2m
+                rules:
+                  - uid: pq-job-dropped
+                    title: A PerceptIQ job was permanently dropped
+                    condition: B
+                    for: 0s
+                    labels:
+                      severity: critical
+                      service: perceptiq
+                    annotations:
+                      summary: A worker terminated a message instead of acking it, so that unit of work is gone for good.
+                      description: There is no dead-letter stream — perceptiq_worker calls msg.term() after max_deliver and the payload is discarded. This log line is the only record that it happened, so treat it as data loss and find the review or scrape it belonged to.
+                    noDataState: OK
+                    execErrState: Alerting
+                    data:
+                      - refId: A
+                        relativeTimeRange:
+                          from: 600
+                          to: 0
+                        datasourceUid: P8E80F9AEF21F6940
+                        model:
+                          refId: A
+                          editorMode: code
+                          queryType: instant
+                          expr: sum(count_over_time({k8s_namespace_name="perceptiq"} |~ `handler failed permanently|poison message` [10m]))
+                      - refId: B
+                        datasourceUid: __expr__
+                        model:
+                          refId: B
+                          type: threshold
+                          expression: A
+                          conditions:
+                            - evaluator:
+                                type: gt
+                                params:
+                                  - 0
+
+                  - uid: pq-api-errors
+                    title: PerceptIQ API is logging errors
+                    condition: B
+                    for: 5m
+                    labels:
+                      severity: warning
+                      service: perceptiq
+                    annotations:
+                      summary: The perceptiq API logged more than 10 ERROR lines in 10 minutes.
+                      description: Nest writes unhandled exceptions through ExceptionsHandler, so Prisma failures, NATS publish failures and Clerk verification problems all surface here. Until the app emits structured logs this is a blunt instrument.
+                      runbook_url: https://grafana.valley.no/explore
+                    noDataState: OK
+                    execErrState: Alerting
+                    data:
+                      - refId: A
+                        relativeTimeRange:
+                          from: 600
+                          to: 0
+                        datasourceUid: P8E80F9AEF21F6940
+                        model:
+                          refId: A
+                          editorMode: code
+                          queryType: instant
+                          expr: sum(count_over_time({k8s_namespace_name="perceptiq", k8s_deployment_name="perceptiq"} |= `ERROR` [10m]))
+                      - refId: B
+                        datasourceUid: __expr__
+                        model:
+                          refId: B
+                          type: threshold
+                          expression: A
+                          conditions:
+                            - evaluator:
+                                type: gt
+                                params:
+                                  - 10
   syncPolicy:
     automated:
       prune: true
