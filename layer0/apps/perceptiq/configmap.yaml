@@ -14,3 +14,8 @@ data:
   VITE_CLERK_PUBLISHABLE_KEY: "pk_test_ZW5oYW5jZWQtcmF2ZW4tNjQuY2xlcmsuYWNjb3VudHMuZGV2JA"
   GOOGLE_APPLICATION_CREDENTIALS: "/etc/gcp/sa-key.json"
   GOOGLE_CLOUD_PROJECT: "perceptiq"
+  # Worker fleet: each step is handled by its standalone worker instead of
+  # in-process. Keep in lockstep with the worker Deployments in workers.yaml.
+  FLEET_SENTIMENT_ENABLED: "true"
+  FLEET_THEME_ENABLED: "true"
+  FLEET_SCRAPER_ENABLED: "true"

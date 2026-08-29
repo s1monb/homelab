@@ -8,5 +8,6 @@ resources:
   - gcp-nlp-secret.yaml
   - postgres.yaml
   - deployment.yaml
+  - workers.yaml
   - service.yaml
   - ingress.yaml
