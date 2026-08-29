@@ -14,3 +14,5 @@ spec:
       images:
         - alias: perceptiq
           imageName: ghcr.io/s1monb/perceptiq
+        - alias: workers
+          imageName: ghcr.io/s1monb/perceptiq-workers

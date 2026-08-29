@@ -1,0 +1,151 @@
+# PerceptIQ worker fleet — one image, WORKER selects which worker runs.
+# Each binds its own durable NATS consumer and writes results straight to
+# Postgres; percept-api still owns the schema/migrations.
+#
+# These only receive work when the matching FLEET_* flag is set in the
+# perceptiq ConfigMap (otherwise the API does that step in-process).
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: perceptiq-sentiment-worker
+  namespace: perceptiq
+  labels:
+    app: perceptiq-sentiment-worker
+    app.kubernetes.io/part-of: perceptiq-workers
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: perceptiq-sentiment-worker
+  template:
+    metadata:
+      labels:
+        app: perceptiq-sentiment-worker
+        app.kubernetes.io/part-of: perceptiq-workers
+    spec:
+      imagePullSecrets:
+        - name: ghcr-pull-secret
+      volumes:
+        - name: gcp-sa-key
+          secret:
+            secretName: gcp-nlp
+      containers:
+        - name: worker
+          image: ghcr.io/s1monb/perceptiq-workers:0.18.0
+          imagePullPolicy: IfNotPresent
+          env:
+            - name: WORKER
+              value: sentiment
+            - name: DATABASE_URL
+              valueFrom:
+                secretKeyRef:
+                  name: perceptiq-db-app
+                  key: uri
+          envFrom:
+            - secretRef:
+                name: perceptiq-secrets
+            - configMapRef:
+                name: perceptiq
+          volumeMounts:
+            - name: gcp-sa-key
+              mountPath: /etc/gcp
+              readOnly: true
+          resources:
+            requests:
+              cpu: 50m
+              memory: 128Mi
+            limits:
+              cpu: 500m
+              memory: 384Mi
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: perceptiq-theme-worker
+  namespace: perceptiq
+  labels:
+    app: perceptiq-theme-worker
+    app.kubernetes.io/part-of: perceptiq-workers
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: perceptiq-theme-worker
+  template:
+    metadata:
+      labels:
+        app: perceptiq-theme-worker
+        app.kubernetes.io/part-of: perceptiq-workers
+    spec:
+      imagePullSecrets:
+        - name: ghcr-pull-secret
+      containers:
+        - name: worker
+          image: ghcr.io/s1monb/perceptiq-workers:0.18.0
+          imagePullPolicy: IfNotPresent
+          env:
+            - name: WORKER
+              value: theme
+            - name: DATABASE_URL
+              valueFrom:
+                secretKeyRef:
+                  name: perceptiq-db-app
+                  key: uri
+          envFrom:
+            - secretRef:
+                name: perceptiq-secrets
+            - configMapRef:
+                name: perceptiq
+          resources:
+            requests:
+              cpu: 50m
+              memory: 128Mi
+            limits:
+              cpu: 500m
+              memory: 384Mi
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: perceptiq-scraper-worker
+  namespace: perceptiq
+  labels:
+    app: perceptiq-scraper-worker
+    app.kubernetes.io/part-of: perceptiq-workers
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: perceptiq-scraper-worker
+  template:
+    metadata:
+      labels:
+        app: perceptiq-scraper-worker
+        app.kubernetes.io/part-of: perceptiq-workers
+    spec:
+      imagePullSecrets:
+        - name: ghcr-pull-secret
+      containers:
+        - name: worker
+          image: ghcr.io/s1monb/perceptiq-workers:0.18.0
+          imagePullPolicy: IfNotPresent
+          env:
+            - name: WORKER
+              value: scraper
+            - name: DATABASE_URL
+              valueFrom:
+                secretKeyRef:
+                  name: perceptiq-db-app
+                  key: uri
+          envFrom:
+            - secretRef:
+                name: perceptiq-secrets
+            - configMapRef:
+                name: perceptiq
+          resources:
+            requests:
+              cpu: 50m
+              memory: 128Mi
+            limits:
+              cpu: 500m
+              memory: 512Mi
