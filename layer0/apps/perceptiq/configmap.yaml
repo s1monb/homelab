@@ -4,9 +4,19 @@ metadata:
   name: perceptiq
   namespace: perceptiq
 data:
+  # One actor per review source. The API carries the same values as defaults in
+  # code, but the Python scraper worker does not — it returns "no actor
+  # configured" for any source missing from here, and FLEET_SCRAPER_ENABLED
+  # means the worker is what actually scrapes in production.
   APIFY_ACTOR_ID: "compass~google-maps-reviews-scraper"
   APIFY_ACTOR_ID_APIFY_FACEBOOK: "apify~facebook-reviews-scraper"
   APIFY_ACTOR_ID_APIFY_TRUSTPILOT: "memo23~trustpilot-scraper-ppe"
+  # thewolves rather than the more popular maxcopell~tripadvisor-reviews, which
+  # 403s until granted full access to the Apify account.
+  APIFY_ACTOR_ID_APIFY_TRIPADVISOR: "thewolves~tripadvisor-reviews-scraper"
+  # solidcode bills per review row. plowdata~booking-com-review-scraper charges
+  # a flat ~$1.80 per run whatever you ask for, so no cap can bring it down.
+  APIFY_ACTOR_ID_APIFY_BOOKING: "solidcode~booking-reviews-scraper"
   APIFY_MAX_REVIEWS: "1000"
   APIFY_SYNC_TIMEOUT_MINUTES: "20"
   CLERK_ISSUER: "https://enhanced-raven-64.clerk.accounts.dev"
