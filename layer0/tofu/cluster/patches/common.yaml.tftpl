@@ -1,0 +1,21 @@
+# Applied to every node. Carried over from the old layer0/talos-cfg/patch.yaml:
+# Cilium supplies the CNI and replaces kube-proxy, and control planes stay
+# schedulable because this cluster has no separate workers.
+cluster:
+  allowSchedulingOnControlPlanes: true
+  network:
+    cni:
+      name: none
+  proxy:
+    disabled: true
+
+machine:
+  install:
+    disk: ${install_disk}
+    # Factory installer for our schematic, so system extensions survive upgrades.
+    image: ${installer_image}
+    # The nocloud image is already written to the disk by Proxmox; wiping on
+    # upgrade would throw away local-path-provisioner data.
+    wipe: false
+  time:
+    servers: ${time_servers}

@@ -4,5 +4,6 @@ metadata:
   name: internal-pool
 spec:
   blocks:
-    - start: 10.0.10.150
-      stop: 10.0.10.200
+    # Above the DHCP range, which stops at 10.0.10.199.
+    - start: 10.0.10.200
+      stop: 10.0.10.254

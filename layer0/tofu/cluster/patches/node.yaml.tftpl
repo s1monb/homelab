@@ -1,0 +1,34 @@
+# Per-node identity and networking.
+#
+# Address and VIP live in the same patch because Talos replaces the
+# `interfaces` list wholesale rather than merging it -- splitting them across
+# two patches silently drops one.
+#
+# deviceSelector rather than a hardcoded `eth0`: Talos uses predictable
+# interface names, so the virtio NIC comes up as something like ens18.
+machine:
+  network:
+    nameservers: ${nameservers}
+    interfaces:
+      - deviceSelector:
+          busPath: "0*"
+        dhcp: false
+        addresses:
+          - ${address}
+        routes:
+          - network: 0.0.0.0/0
+            gateway: ${gateway}
+        # Shared control-plane VIP. Whichever node holds it answers on
+        # ${vip}:6443, so the API survives losing a Proxmox host.
+        vip:
+          ip: ${vip}
+---
+# As of Talos 1.13 the hostname lives in its own document, and setting
+# machine.network.hostname as well is rejected ("static hostname is already set
+# in v1alpha1 config"). `auto` defaults to "stable", which derives a name like
+# talos-8e1-15n from the machine id; it has to be turned off explicitly or Talos
+# rejects having both ("'auto' and 'hostname' cannot be set at the same time").
+apiVersion: v1alpha1
+kind: HostnameConfig
+auto: "off"
+hostname: ${hostname}

@@ -1,0 +1,25 @@
+# Copy to layer0/tofu/.envrc (gitignored by the root `.envrc` pattern) and
+# adjust the 1Password item references. Nested so that `op read` only runs when
+# you cd into the infra tree, not on every shell in the repo.
+#
+# `op signin` first if your session has expired.
+
+source_up
+
+# --- OpenTofu state encryption ----------------------------------------------
+# Minimum 16 characters. Losing this means losing the ability to read the
+# committed state -- store it in 1Password and nowhere else.
+export TF_VAR_state_passphrase="$(op read 'op://layer0/tofu-state/password')"
+
+# --- Proxmox -----------------------------------------------------------------
+# Any node of the cluster; permissions are cluster-wide so one token covers all.
+export PROXMOX_VE_ENDPOINT="https://10.0.10.2:8006/"
+# The FULL token string, "user@realm!tokenid=secret", not just the secret --
+# e.g. tofu@pve!tofu=xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxxx
+# See "Proxmox credentials" in the README for the pveum commands that mint it.
+export PROXMOX_VE_API_TOKEN="$(op read 'op://layer0/proxmox-tofu/credential')"
+# Self-signed Proxmox cert.
+export PROXMOX_VE_INSECURE=true
+
+# --- Stage 2 (layer0/tofu/bootstrap) ----------------------------------------
+export TF_VAR_onepassword_connect_token="$(op read 'op://layer0/onepassword-connect/token')"
