@@ -1,3 +1,16 @@
 .envrc
 1password-credentials.json
 CLAUDE.md
+
+# OpenTofu
+#
+# terraform.tfstate IS committed on purpose -- it is encrypted at rest (see the
+# `encryption` block in layer0/tofu/cluster/versions.tf) and holds the Talos PKI
+# that makes the cluster reproducible. Everything below can leak plaintext, so
+# it stays out.
+.terraform/
+*.tfplan
+*.tfstate.backup
+crash.log
+crash.*.log
+layer0/tofu/*/output/

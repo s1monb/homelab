@@ -1,0 +1,38 @@
+# CRDs only -- no operator. The nats and otel-collector charts both render a
+# PodMonitor, and without monitoring.coreos.com installed their sync fails
+# outright ("could not find monitoring.coreos.com/PodMonitor"), which took NATS
+# down and with it everything that talks to it.
+#
+# The old cluster had these CRDs, but nothing in this repo installed them --
+# they had been applied by hand and existed only inside the cluster. This
+# Application is what makes them reproducible.
+#
+# sync-wave -3 so they land before any Application that renders a PodMonitor.
+apiVersion: argoproj.io/v1alpha1
+kind: Application
+metadata:
+  name: prometheus-operator-crds
+  namespace: argocd
+  annotations:
+    argocd.argoproj.io/sync-wave: "-3"
+  finalizers:
+    - resources-finalizer.argocd.argoproj.io
+spec:
+  destination:
+    namespace: monitoring
+    server: https://kubernetes.default.svc
+  project: default
+  source:
+    chart: prometheus-operator-crds
+    repoURL: https://prometheus-community.github.io/helm-charts
+    targetRevision: 31.0.1
+    helm:
+      releaseName: prometheus-operator-crds
+  syncPolicy:
+    automated:
+      prune: true
+      selfHeal: true
+    syncOptions:
+      - CreateNamespace=true
+      # The CRDs exceed the annotation size limit for client-side apply.
+      - ServerSideApply=true

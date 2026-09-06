@@ -55,3 +55,30 @@ jobs:
           print(f"checked {len(files)} yaml files")
           sys.exit(bad)
           PY
+
+  tofu:
+    name: OpenTofu fmt + validate
+    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        dir: [layer0/tofu/cluster, layer0/tofu/bootstrap]
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: opentofu/setup-opentofu@v1
+        with:
+          tofu_version: 1.12.6
+
+      - name: tofu fmt
+        run: tofu fmt -check -recursive ${{ matrix.dir }}
+
+      # -backend=false skips state entirely, but the encryption block is still
+      # parsed at init, so it needs a passphrase. This throwaway one never
+      # decrypts anything.
+      - name: tofu validate
+        working-directory: ${{ matrix.dir }}
+        env:
+          TF_VAR_state_passphrase: ci-placeholder-passphrase-not-a-secret
+        run: |
+          tofu init -backend=false -input=false
+          tofu validate
